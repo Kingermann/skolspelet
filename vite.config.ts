@@ -29,8 +29,14 @@ function contentSecurityPolicy(): Plugin {
   }
 }
 
+/** Adressen på GitHub Pages blir https://<användare>.github.io/skolspelet/ */
+const PAGES_BASE = '/skolspelet/'
+
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command, isPreview }) => ({
+  // Den färdiga versionen (och förhandsvisningen av den) ligger under /skolspelet/,
+  // utvecklingsservern under /.
+  base: command === 'build' || isPreview ? PAGES_BASE : '/',
   plugins: [react(), contentSecurityPolicy()],
   server: {
     // Bara den här datorn kommer åt utvecklingsservern. För att testa på telefonen
@@ -38,4 +44,4 @@ export default defineConfig({
     // offentliga eller okända nätverk).
     port: 5173,
   },
-})
+}))
