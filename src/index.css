@@ -931,3 +931,51 @@ button:disabled {
     opacity: 0.35;
   }
 }
+
+/* ---------- Geografi: flaggquiz ---------- */
+.flag-card {
+  padding: 18px 16px 14px;
+}
+
+.flag-question {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.fi.flag-big {
+  display: block;
+  width: min(68vw, 260px);
+  height: calc(min(68vw, 260px) * 0.75);
+  margin: 14px auto 4px;
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 1px rgba(43, 34, 80, 0.15),
+    0 6px 14px rgba(43, 34, 80, 0.15);
+}
+
+.fi.flag-mini {
+  width: 2.4em;
+  height: 1.8em;
+  vertical-align: middle;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(43, 34, 80, 0.2);
+}
+
+.flag-message {
+  font-size: 18px;
+}
+
+.flag-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.choice.flag-option {
+  padding: 15px 10px;
+  font-size: 22px;
+}
+
+.tile-mode .tile-big {
+  font-size: 30px;
+}

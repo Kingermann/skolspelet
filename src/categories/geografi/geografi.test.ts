@@ -6,6 +6,9 @@ import { ROUND_LENGTH } from '../../game/constants'
 import { COUNTRIES, CONTINENTS, IGNORED, MERGED_INTO, TERRITORIES, type Continent } from './countries'
 import { buildContinentMap } from './map'
 import { pickRoundCountries } from './round'
+import { countriesIn, LOOKALIKE_GROUPS, lookalikesOf, makeFlagOptions } from './flags'
+import { existsSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import { LEVELS } from '../../game/levels'
 
 const require = createRequire(import.meta.url)
@@ -160,5 +163,65 @@ describe('nivåer', () => {
     const medium = levelOf(pickRoundCountries(countries, 'medel'))
     expect(count(medium, 2)).toBe(4)
     expect(count(medium, 1)).toBe(6)
+  })
+})
+
+describe('flaggor', () => {
+  const flagDir = join(dirname(require.resolve('flag-icons/package.json')), 'flags', '4x3')
+
+  it('varje land har en unik landskod med en flaggbild', () => {
+    const codes = Object.values(COUNTRIES).map((c) => c.iso)
+    expect(new Set(codes).size).toBe(codes.length)
+    for (const [name, c] of Object.entries(COUNTRIES)) expect(existsSync(join(flagDir, `${c.iso}.svg`)), `${name} (${c.iso})`).toBe(true)
+  })
+
+  it('liknande-grupperna innehåller bara riktiga länder', () => {
+    for (const group of LOOKALIKE_GROUPS) for (const name of group) expect(COUNTRIES[name], name).toBeDefined()
+  })
+
+  it.each(ALL_CONTINENTS)('%s: fyra olika alternativ, rätt svar finns med, alla från samma världsdel', (continent) => {
+    const all = countriesIn(continent)
+    for (const level of LEVELS) {
+      for (const answer of all) {
+        const options = makeFlagOptions(answer, all, level)
+        expect(options).toHaveLength(4)
+        expect(new Set(options.map((o) => o.id)).size).toBe(4)
+        expect(options.map((o) => o.id)).toContain(answer.id)
+        for (const o of options) expect(COUNTRIES[o.id].continents, `${answer.id}: ${o.id}`).toContain(continent)
+      }
+    }
+  })
+
+  it('Lätt: felalternativen har inte liknande flaggor (Sverige får inga nordiska grannar)', () => {
+    const europe = countriesIn('europa')
+    const sweden = europe.find((c) => c.id === 'Sweden')!
+    for (let i = 0; i < 100; i++) {
+      for (const o of makeFlagOptions(sweden, europe, 'latt')) expect(['Norway', 'Denmark', 'Finland', 'Iceland']).not.toContain(o.id)
+    }
+  })
+
+  it('Svår: felalternativen är liknande flaggor när det finns (Sverige ⇒ tre nordiska länder)', () => {
+    const europe = countriesIn('europa')
+    const sweden = europe.find((c) => c.id === 'Sweden')!
+    for (let i = 0; i < 100; i++) {
+      const wrong = makeFlagOptions(sweden, europe, 'svar').filter((o) => o.id !== 'Sweden')
+      for (const o of wrong) expect(lookalikesOf('Sweden').has(o.id), o.id).toBe(true)
+    }
+  })
+
+  it('Medel: minst två liknande flaggor när det finns (Italien)', () => {
+    const europe = countriesIn('europa')
+    const italy = europe.find((c) => c.id === 'Italy')!
+    for (let i = 0; i < 100; i++) {
+      const similar = makeFlagOptions(italy, europe, 'medel').filter((o) => lookalikesOf('Italy').has(o.id))
+      expect(similar.length).toBeGreaterThanOrEqual(2)
+    }
+  })
+
+  it.each(ALL_CONTINENTS)('%s: varje nivå ger 10 olika flaggor', (continent) => {
+    for (const level of LEVELS) {
+      const round = pickRoundCountries(countriesIn(continent), level)
+      expect(new Set(round.map((c) => c.id)).size).toBe(ROUND_LENGTH)
+    }
   })
 })

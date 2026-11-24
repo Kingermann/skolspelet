@@ -1,6 +1,6 @@
 import { defineCategory } from '../types'
+import { GeoPlay, type GeoSettings } from './GeoPlay'
 import { GeoSetup } from './GeoSetup'
-import { MapRound, type GeoSettings } from './MapRound'
 
 export const geografi = defineCategory<GeoSettings>({
   id: 'geografi',
@@ -8,5 +8,5 @@ export const geografi = defineCategory<GeoSettings>({
   icon: '🌍',
   color: '#2ec27e',
   Setup: GeoSetup,
-  Play: MapRound,
+  Play: GeoPlay,
 })

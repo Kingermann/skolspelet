@@ -4,8 +4,12 @@ Ett spel för att öva på skolämnen. Välj kategori, spela en runda, samla stj
 fotbollskort och klistermärken!
 
 - **🧮 Matte** – välj årskurs (1–6), räknesätt och nivå. Tio uppgifter per runda, varav tre textuppgifter.
-- **🌍 Geografi** – välj världsdel och nivå. Du får ett land och ska trycka där det ligger på kartan.
+- **🌍 Geografi** – välj spelläge, världsdel och nivå:
+  - **🗺️ Var ligger landet?** – du får ett land och ska trycka där det ligger på kartan.
+  - **🚩 Flaggor** – du ser en flagga och väljer rätt land bland fyra.
+
   Lätt = stora och kända länder, Medel = lite mindre länder, Svår = små och kluriga länder.
+  I flaggquizet blir felalternativen på Medel och Svår flaggor som liknar den rätta.
 
 ## Starta spelet
 
@@ -30,6 +34,7 @@ Stäng av med `Ctrl + C` i terminalen.
 | **Matte:** största tal (nu 1000) och antal textuppgifter | `MAX_NUMBER` / `STORIES_PER_ROUND` i samma fil |
 | **Matte:** textuppgifterna (berättelser, namn) | `src/categories/matte/stories.ts` |
 | **Geografi:** svenska landsnamn, världsdel och nivå (1 = Lätt, 2 = Medel, 3 = Svår) | `src/categories/geografi/countries.ts` |
+| **Geografi:** grupper av flaggor som liknar varandra | `src/categories/geografi/flags.ts` |
 | Antal frågor per runda | `ROUND_LENGTH` i `src/game/constants.ts` |
 | Klistermärken och fotbollsspelare | `src/game/stickers.ts` |
 | Hur mycket konfetti det blir | `src/game/celebrate.ts` |
@@ -43,6 +48,13 @@ Fotbollskorten visar landslagströjan med nummer. Vill ni ha en egen bild istäl
 
 1. Lägg bilden i mappen `public/stickers/`, t.ex. `public/stickers/ronaldo.png`
 2. Lägg till `image: 'ronaldo.png'` på spelaren i `src/game/stickers.ts`
+
+## Flaggor
+
+Flaggorna kommer från paketet [flag-icons](https://flagicons.lipis.dev) (MIT-licens) och har den
+officiella, aktuella designen (t.ex. Syriens nya flagga). Alla visas i formatet 4:3, så proportionerna
+kan skilja lite från verkligheten (Schweiz blir t.ex. rektangulär). Afghanistan visas med den flagga
+som FN och Sverige använder.
 
 ## Lägga till en ny kategori
 
@@ -68,11 +80,13 @@ npm test
   inget tal är större än 1000 och alla tal i uträkningen står i textuppgiften.
 - **Geografi:** varje område i kartdatan är klassat, alla länder har svenskt namn och världsdel,
   varje världsdels karta innehåller exakt sina länder och varje nivå ger 10 olika länder
-  (har en nivå för få länder fylls rundan på från närmaste nivå).
+  (har en nivå för få länder fylls rundan på från närmaste nivå). Varje land har en landskod med en
+  flaggbild, svarsalternativen är fyra olika länder från samma världsdel, och på Svår är felalternativen
+  liknande flaggor när sådana finns.
 
 ## Idéer för nästa steg
 
-- Geografi: huvudstäder i Europa, flaggor, Sveriges landskap
+- Geografi: huvudstäder i Europa, Sveriges landskap, "välj rätt flagga" (omvänt flaggquiz)
 - Geografi: "Fyll hela kartan" som utmaning
 - Matte: klockan, former, bråk, negativa tal och decimaltal
 - Uppläsning av frågor

@@ -3,15 +3,12 @@ import { Header } from '../../components/Header'
 import { Progress } from '../../components/Progress'
 import { LEVEL_STYLE, type Level } from '../../game/levels'
 import { useRoundFlow } from '../../game/useRoundFlow'
-import { CONTINENTS, type Continent } from './countries'
+import { CONTINENTS } from './countries'
 import { buildContinentMap, loadTopology, type ContinentMap, type MapShape } from './map'
 import { pickRoundCountries } from './round'
+import type { GeoSettings } from './settings'
 import { WorldMap } from './WorldMap'
 
-export interface GeoSettings {
-  continent: Continent
-  level: Level
-}
 
 interface Props {
   settings: GeoSettings
@@ -56,9 +53,7 @@ function RoundHeader({ settings, onQuit }: { settings: GeoSettings; onQuit: () =
       backIcon="✕"
       backLabel="Avsluta rundan"
     >
-      <span className="chip">
-        {info.icon} {info.name}
-      </span>
+      <span className="chip">🗺️ {info.name}</span>
       <span className="chip">{LEVEL_STYLE[settings.level].label}</span>
     </Header>
   )
