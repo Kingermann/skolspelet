@@ -19,8 +19,11 @@ npm run dev
 ```
 
 - **På datorn:** öppna http://localhost:5173
-- **På iPhonen:** se till att telefonen är på samma wifi som datorn och öppna adressen
-  som står vid `Network:` i terminalen, t.ex. `http://192.168.x.x:5173`
+- **På telefonen hemma:** starta med `npm run dev:lan` istället, se till att telefonen är på samma
+  wifi och öppna adressen vid `Network:` i terminalen, t.ex. `http://192.168.x.x:5173`.
+  Använd **bara** `dev:lan` på hemnätverket – aldrig på offentliga eller okända nätverk
+  (utvecklingsservern är inte gjord för att vara nåbar av andra). Datorns brandvägg måste
+  också släppa in anslutningar till `node`.
 
 Stäng av med `Ctrl + C` i terminalen.
 
@@ -69,6 +72,17 @@ Länders gränser kommer från [Natural Earth](https://www.naturalearthdata.com/
 via paketet `world-atlas`. Kartan visar bara vald världsdel. Områden som inte är egna länder
 (t.ex. Grönland och Västsahara) visas gråa och går inte att trycka på. Pyttesmå länder har en
 ring runt sig så att de går att hitta. Tuvalu saknas i kartdatan.
+
+## Säkerhet och integritet
+
+- Appen sparar ingenting och skickar inga uppgifter någonstans – inga konton, ingen analys.
+- Typsnittet (Fredoka) ligger i appen själv, så inga anrop går till Google när man spelar.
+- Den färdiga versionen (`npm run build`) har en Content Security Policy: sidan får bara ladda
+  kod, stil, bilder, typsnitt och data från sin egen adress.
+- Utvecklingsservern lyssnar bara på den egna datorn (`npm run dev`), om man inte uttryckligen
+  startar `npm run dev:lan`.
+- Kontrollera beroenden innan publicering: `npm audit` och `npm audit signatures`.
+  Installationsskript körs bara för godkända paket (se `allowScripts` i `package.json`).
 
 ## Tester
 

@@ -1,12 +1,15 @@
-import confetti from 'canvas-confetti'
+import canvasConfetti from 'canvas-confetti'
 
 /**
  * Konfetti över hela skärmen (med biblioteket canvas-confetti).
  * Testa att ändra antal (particleCount), spridning (spread) och fart (startVelocity)!
  */
 
+// Egen konfetti-instans utan "worker" – så att sidans säkerhetsregler (CSP) kan vara strikta.
+const confetti = canvasConfetti.create(undefined, { resize: true, useWorker: false, disableForReducedMotion: true })
+
 const COLORS = ['#ff5c8a', '#ffd23f', '#3da5ff', '#2ec27e', '#9b5cff', '#ff9f1c', '#ffffff']
-const base = { colors: COLORS, disableForReducedMotion: true, zIndex: 50 }
+const base = { colors: COLORS, zIndex: 50 }
 
 /** Rätt svar: två konfettikanoner från nederkanten + en smäll i mitten. */
 export function celebrateCorrect(big = false) {

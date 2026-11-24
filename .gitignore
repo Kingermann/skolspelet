@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Miljövariabler och nycklar ska aldrig in i git
+.env*
+!.env.example
