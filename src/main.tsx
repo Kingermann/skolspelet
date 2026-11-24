@@ -1,10 +1,7 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+// Ingen StrictMode: i utvecklingsläge kör den effekter två gånger,
+// vilket skulle spela fanfaren dubbelt.
+createRoot(document.getElementById('root')!).render(<App />)

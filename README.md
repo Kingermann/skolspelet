@@ -1,32 +1,48 @@
-# React + TypeScript + Vite
+# 🧮 Mattespelet
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Ett mattespel för åk 1–6. Välj årskurs, räknesätt och nivå, räkna tio uppgifter,
+samla stjärnor och klistermärken!
 
-Currently, two official plugins are available:
+## Starta spelet
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install     # bara första gången
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+- **På datorn:** öppna http://localhost:5173
+- **På iPhonen:** se till att telefonen är på samma wifi som datorn och öppna adressen
+  som står vid `Network:` i terminalen, t.ex. `http://192.168.x.x:5173`
+
+Stäng av med `Ctrl + C` i terminalen.
+
+> Inget sparas – laddar man om sidan börjar allt om. Ljudet hörs inte om iPhonen står på ljudlöst.
+
+## Var ändrar man saker?
+
+| Vill ni ändra… | Fil |
+|---|---|
+| Hur svårt det är (talområden per årskurs och nivå) | `src/game/config.ts` |
+| Vilka klistermärken som finns | `src/game/stickers.ts` |
+| Färger och utseende | `src/index.css` (överst finns alla färger) |
+| Beröm-texterna ("Snyggt! ⭐") | `src/components/Round.tsx` |
+| Ljuden | `src/game/sound.ts` |
+
+## Kontrollera att facit stämmer
+
+```bash
+npm test
+```
+
+Testerna genererar tusentals uppgifter för varje årskurs, nivå och räknesätt och kollar
+att svaret alltid är rätt, att det är ett heltal ≥ 0 och att talen håller sig inom talområdet.
+
+## Idéer för nästa steg
+
+- Karta och "bygg din värld"
+- Klockan, former, bråk och andra moment
+- Negativa tal och decimaltal
+- Strategitips när man svarar fel
+- Uppläsning av uppgifter
+- Spara framsteg (localStorage)
+- Publicera på GitHub Pages så att spelet fungerar utan datorn

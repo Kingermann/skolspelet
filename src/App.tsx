@@ -1,122 +1,107 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useMemo, useState } from 'react'
+import { AlbumScreen, GradeScreen, LevelScreen, OpScreen, StartScreen } from './components/Menus'
+import { Result } from './components/Result'
+import { Round } from './components/Round'
+import { SoundContext } from './components/SoundContext'
+import { setSoundEnabled, sounds } from './game/sound'
+import { pickSticker } from './game/stickers'
+import type { Grade, Level, OpChoice } from './game/types'
 
-function App() {
-  const [count, setCount] = useState(0)
+type Screen = 'start' | 'grade' | 'op' | 'level' | 'round' | 'result' | 'album'
+
+/**
+ * Hela spelets tillstånd ligger här, i minnet.
+ * Inget sparas: laddar man om sidan börjar allt om från början.
+ */
+export default function App() {
+  const [screen, setScreen] = useState<Screen>('start')
+  const [grade, setGrade] = useState<Grade>(1)
+  const [op, setOp] = useState<OpChoice>('+')
+  const [level, setLevel] = useState<Level>('latt')
+  const [album, setAlbum] = useState<string[]>([])
+  const [result, setResult] = useState({ firstTryCorrect: 0, sticker: '' })
+  const [roundId, setRoundId] = useState(0)
+  const [albumBack, setAlbumBack] = useState<Screen>('start')
+  const [soundOn, setSoundOn] = useState(true)
+
+  const sound = useMemo(
+    () => ({
+      on: soundOn,
+      toggle: () => {
+        setSoundEnabled(!soundOn)
+        setSoundOn(!soundOn)
+        if (!soundOn) sounds.tap()
+      },
+    }),
+    [soundOn],
+  )
+
+  function startRound() {
+    setRoundId((id) => id + 1)
+    setScreen('round')
+  }
+
+  function finishRound(firstTryCorrect: number) {
+    const sticker = pickSticker(album)
+    setAlbum((a) => [...a, sticker])
+    setResult({ firstTryCorrect, sticker })
+    setScreen('result')
+  }
+
+  function openAlbum(from: Screen) {
+    setAlbumBack(from)
+    setScreen('album')
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <SoundContext.Provider value={sound}>
+      <main className="app">
+        {screen === 'start' && (
+          <StartScreen albumCount={new Set(album).size} onPlay={() => setScreen('grade')} onAlbum={() => openAlbum('start')} />
+        )}
+        {screen === 'grade' && (
+          <GradeScreen
+            onBack={() => setScreen('start')}
+            onPick={(g) => {
+              setGrade(g)
+              setScreen('op')
+            }}
+          />
+        )}
+        {screen === 'op' && (
+          <OpScreen
+            grade={grade}
+            onBack={() => setScreen('grade')}
+            onPick={(o) => {
+              setOp(o)
+              setScreen('level')
+            }}
+          />
+        )}
+        {screen === 'level' && (
+          <LevelScreen
+            grade={grade}
+            op={op}
+            onBack={() => setScreen('op')}
+            onPick={(l) => {
+              setLevel(l)
+              startRound()
+            }}
+          />
+        )}
+        {screen === 'round' && (
+          <Round key={roundId} grade={grade} level={level} op={op} onFinish={finishRound} onQuit={() => setScreen('start')} />
+        )}
+        {screen === 'result' && (
+          <Result
+            {...result}
+            onAgain={startRound}
+            onHome={() => setScreen('start')}
+            onAlbum={() => openAlbum('result')}
+          />
+        )}
+        {screen === 'album' && <AlbumScreen album={album} onBack={() => setScreen(albumBack)} />}
+      </main>
+    </SoundContext.Provider>
   )
 }
-
-export default App
