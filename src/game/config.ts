@@ -9,21 +9,24 @@ import type { Grade, Level, Op, TaskSpec } from './types'
 
 type LevelTable = Record<Level, Partial<Record<Op, TaskSpec>>>
 
+/** Inget tal i spelet (varken i uppgiften eller svaret) får vara större än detta. */
+export const MAX_NUMBER = 1000
+
 /** Talområde från min till max (inklusive). Listor som [2, 5, 10] betyder bara de talen. */
 const r = (min: number, max: number) => ({ min, max })
 
 const åk4Medel: Partial<Record<Op, TaskSpec>> = {
-  '+': { kind: 'add', max: 10000 },
-  '-': { kind: 'sub', max: 10000 },
+  '+': { kind: 'add', max: MAX_NUMBER, carry: 'yes' },
+  '-': { kind: 'sub', max: MAX_NUMBER, borrow: 'yes' },
   '×': { kind: 'mul', a: r(11, 99), b: r(2, 9) },
   '÷': { kind: 'div', divisor: r(2, 9), quotient: r(11, 40) },
 }
 
 const åk5Medel: Partial<Record<Op, TaskSpec>> = {
-  '+': { kind: 'add', max: 100000, step: 100 },
-  '-': { kind: 'sub', max: 100000, step: 100 },
-  '×': { kind: 'mul', a: r(2, 999), b: [10, 100, 1000] },
-  '÷': { kind: 'div', divisor: [10, 100, 1000], quotient: r(2, 999) },
+  '+': { kind: 'add', max: MAX_NUMBER, carry: 'yes', missingChance: 0.3 },
+  '-': { kind: 'sub', max: MAX_NUMBER, borrow: 'yes', missingChance: 0.3 },
+  '×': { kind: 'mul', a: r(2, 99), b: [10, 100], max: MAX_NUMBER },
+  '÷': { kind: 'div', divisor: [10, 100], quotient: r(2, 99), max: MAX_NUMBER },
 }
 
 export const CONFIG: Record<Grade, LevelTable> = {
@@ -87,19 +90,19 @@ export const CONFIG: Record<Grade, LevelTable> = {
     },
     medel: åk4Medel,
     svar: {
-      '+': { kind: 'add', max: 10000, carry: 'yes', threeTermsChance: 0.5 },
-      '-': { kind: 'sub', max: 10000, borrow: 'yes', threeTermsChance: 0.5 },
-      '×': { kind: 'mul', a: r(101, 999), b: r(2, 9) },
-      '÷': { kind: 'div', divisor: r(2, 9), quotient: r(21, 150) },
+      '+': { kind: 'add', max: MAX_NUMBER, carry: 'yes', threeTermsChance: 0.5 },
+      '-': { kind: 'sub', max: MAX_NUMBER, borrow: 'yes', threeTermsChance: 0.5 },
+      '×': { kind: 'mul', a: r(101, 499), b: r(2, 9), max: MAX_NUMBER },
+      '÷': { kind: 'div', divisor: r(2, 9), quotient: r(21, 150), max: MAX_NUMBER },
     },
   },
   5: {
     latt: åk4Medel,
     medel: åk5Medel,
     svar: {
-      '+': { kind: 'add', max: 100000, missingChance: 0.5 },
-      '-': { kind: 'sub', max: 100000, missingChance: 0.5 },
-      '×': { kind: 'mul', a: r(11, 99), b: r(11, 99), missingChance: 0.2 },
+      '+': { kind: 'add', max: MAX_NUMBER, carry: 'yes', missingChance: 0.4, threeTermsChance: 0.3 },
+      '-': { kind: 'sub', max: MAX_NUMBER, borrow: 'yes', missingChance: 0.4, threeTermsChance: 0.3 },
+      '×': { kind: 'mul', a: r(11, 99), b: r(11, 99), max: MAX_NUMBER, missingChance: 0.2 },
       '÷': { kind: 'div', divisor: r(11, 25), quotient: r(2, 30), missingChance: 0.3 },
     },
   },

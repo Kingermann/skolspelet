@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CONFIG, opsForGrade } from './config'
+import { CONFIG, MAX_NUMBER, opsForGrade } from './config'
 import { generateProblem, hasBorrow, hasCarry, makeChoices } from './generator'
 import { generateRound } from './round'
 import { generateStory } from './stories'
@@ -62,6 +62,25 @@ describe.each(allCombos())('åk %i, %s, %s', (grade, level, op) => {
 })
 
 describe('talområden', () => {
+  it(`inget tal är större än ${MAX_NUMBER} – varken i uppgifter, textuppgifter eller svar`, () => {
+    for (const [grade, level, op] of allCombos()) {
+      for (let i = 0; i < SAMPLES; i++) {
+        for (const p of [generateProblem(grade, level, op), generateStory(grade, level, op)]) {
+          const text = `${p.solution} ${p.story ?? ''}`.replace(/(\d)\u00A0(\d)/g, '$1$2')
+          for (const x of numbersIn(text)) expect(x, `åk ${grade} ${level}: ${p.story ?? p.solution}`).toBeLessThanOrEqual(MAX_NUMBER)
+        }
+      }
+    }
+  })
+
+  it(`svarsalternativen på Lätt är aldrig större än ${MAX_NUMBER}`, () => {
+    for (const [grade, op] of GRADES.flatMap((g) => [...opsForGrade(g), 'mix' as const].map((o) => [g, o] as const))) {
+      for (let i = 0; i < SAMPLES; i++) {
+        for (const c of makeChoices(generateProblem(grade, 'latt', op))) expect(c).toBeLessThanOrEqual(MAX_NUMBER)
+      }
+    }
+  })
+
   it('åk 1 använder bara tal upp till 20', () => {
     for (const level of LEVELS) {
       for (let i = 0; i < SAMPLES; i++) {

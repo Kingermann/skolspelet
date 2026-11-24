@@ -23,6 +23,7 @@ Stäng av med `Ctrl + C` i terminalen.
 | Vill ni ändra… | Fil |
 |---|---|
 | Hur svårt det är (talområden per årskurs och nivå) | `src/game/config.ts` |
+| Största tal i spelet (nu 1000) | `MAX_NUMBER` i `src/game/config.ts` |
 | Textuppgifterna (berättelser, namn) | `src/game/stories.ts` |
 | Hur många textuppgifter per runda | `STORIES_PER_ROUND` i `src/game/config.ts` |
 | Vilka klistermärken och fotbollsspelare som finns | `src/game/stickers.ts` |
@@ -46,7 +47,7 @@ npm test
 ```
 
 Testerna genererar tusentals uppgifter (även textuppgifter) för varje årskurs, nivå och
-räknesätt och kollar att svaret alltid är rätt, att det är ett heltal ≥ 0, att talen håller
+räknesätt och kollar att svaret alltid är rätt, att det är ett heltal ≥ 0, att inget tal är större än 1000, att talen håller
 sig inom talområdet och att alla tal i uträkningen faktiskt står i textuppgiften.
 
 ## Idéer för nästa steg

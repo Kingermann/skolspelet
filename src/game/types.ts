@@ -35,6 +35,8 @@ export interface MulSpec {
   kind: 'mul'
   a: NumberSource
   b: NumberSource
+  /** Största tillåtna svar (produkt). */
+  max?: number
   missingChance?: number
 }
 
@@ -42,6 +44,8 @@ export interface DivSpec {
   kind: 'div'
   divisor: NumberSource
   quotient: NumberSource
+  /** Största tillåtna tal att dela. */
+  max?: number
   missingChance?: number
 }
 

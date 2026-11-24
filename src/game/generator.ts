@@ -1,4 +1,4 @@
-import { CONFIG, opsForGrade } from './config'
+import { CONFIG, MAX_NUMBER, opsForGrade } from './config'
 import type {
   AddSpec,
   DivSpec,
@@ -140,15 +140,21 @@ export function pickSubPair(spec: SubSpec): [number, number] {
 }
 
 export function pickMulPair(spec: MulSpec): [number, number] {
-  const a = pick(spec.a)
-  const b = pick(spec.b)
+  const [a, b] = tryUntil(
+    () => [pick(spec.a), pick(spec.b)] as const,
+    ([a, b]) => spec.max === undefined || a * b <= spec.max,
+    1000,
+  )
   return chance(0.5) ? [b, a] : [a, b]
 }
 
 /** [tal, nämnare, kvot] där divisionen alltid går jämnt ut. */
 export function pickDivTriple(spec: DivSpec): [number, number, number] {
-  const d = pick(spec.divisor)
-  const q = pick(spec.quotient)
+  const [d, q] = tryUntil(
+    () => [pick(spec.divisor), pick(spec.quotient)] as const,
+    ([d, q]) => spec.max === undefined || d * q <= spec.max,
+    1000,
+  )
   return [d * q, d, q]
 }
 
@@ -384,7 +390,7 @@ export function generateProblem(grade: Grade, level: Level, choice: OpChoice): P
 export function makeChoices(problem: Problem): number[] {
   const { answer, unit } = problem
   const wrong = new Set<number>()
-  const ok = (n: number) => Number.isInteger(n) && n >= 0 && n !== answer && !wrong.has(n)
+  const ok = (n: number) => Number.isInteger(n) && n >= 0 && n <= MAX_NUMBER && n !== answer && !wrong.has(n)
 
   for (const m of shuffle(problem.mistakes)) {
     if (wrong.size >= 2) break
@@ -395,8 +401,8 @@ export function makeChoices(problem: Problem): number[] {
     if (wrong.size >= 3) break
     if (ok(n)) wrong.add(n)
   }
-  for (let k = 3; wrong.size < 3; k++) {
-    if (ok(answer + k * unit)) wrong.add(answer + k * unit)
+  for (let k = 3; wrong.size < 3 && k < 2000; k++) {
+    for (const n of [answer + k * unit, answer - k * unit]) if (wrong.size < 3 && ok(n)) wrong.add(n)
   }
   return shuffle([answer, ...wrong])
 }
