@@ -63,4 +63,8 @@ export interface Problem {
   mistakes: number[]
   /** Hur "grovt" svaret är (1, 10, 100…). Smarta fel ändras med denna storlek. */
   unit: number
+  /** Textuppgift: frågan i ord, t.ex. "Per har 2 äpplen och får 5 till…". */
+  story?: string
+  /** Vad svaret räknar, t.ex. "äpplen" (visas efter svarsrutan). */
+  answerLabel?: string
 }

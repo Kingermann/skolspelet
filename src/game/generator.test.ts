@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { CONFIG, opsForGrade } from './config'
-import { generateProblem, generateRound, hasBorrow, hasCarry, makeChoices } from './generator'
+import { generateProblem, hasBorrow, hasCarry, makeChoices } from './generator'
+import { generateRound } from './round'
+import { generateStory } from './stories'
 import type { Grade, Level, OpChoice, Problem } from './types'
 
 const GRADES: Grade[] = [1, 2, 3, 4, 5, 6]
@@ -125,13 +127,52 @@ describe('växlingskontroller', () => {
   })
 })
 
+describe.each(allCombos())('textuppgifter åk %i, %s, %s', (grade, level, op) => {
+  const stories: Problem[] = Array.from({ length: SAMPLES }, () => generateStory(grade, level, op))
+
+  it('facit stämmer och svaret är ett heltal ≥ 0', () => {
+    for (const p of stories) {
+      const [left, right] = p.solution.split('=')
+      expect(evaluate(left), p.story).toBe(evaluate(right))
+      expect(Number.isInteger(p.answer), p.story).toBe(true)
+      expect(p.answer, p.story).toBeGreaterThanOrEqual(0)
+    }
+  })
+
+  it('har alltid en berättelse och en enhet för svaret', () => {
+    for (const p of stories) {
+      expect(p.story, p.question).toBeTruthy()
+      expect(p.answerLabel, p.question).toBeTruthy()
+      expect(p.story).not.toMatch(/undefined|NaN|\?\s*\?/)
+      expect(p.story).toMatch(/\?$/)
+    }
+  })
+
+  it('alla tal i uträkningen finns med i berättelsen', () => {
+    for (const p of stories) {
+      const storyNumbers = numbersIn(p.story!.replace(/(\d)\u00A0(\d)/g, '$1$2'))
+      const [left] = p.solution.split('=')
+      for (const x of numbersIn(left)) expect(storyNumbers, `${p.story} ⇒ ${p.solution}`).toContain(x)
+    }
+  })
+
+  it('svarsalternativen på Lätt fungerar', () => {
+    for (const p of stories) {
+      const choices = makeChoices(p)
+      expect(new Set(choices).size).toBe(4)
+      expect(choices).toContain(p.answer)
+    }
+  })
+})
+
 describe('generateRound', () => {
-  it('ger 10 unika uppgifter', () => {
+  it('ger 10 unika uppgifter varav 3 textuppgifter', () => {
     for (const grade of GRADES) {
       for (const level of LEVELS) {
         const round = generateRound(grade, level, 'mix')
         expect(round).toHaveLength(10)
-        expect(new Set(round.map((p) => p.question)).size).toBe(10)
+        expect(new Set(round.map((p) => p.story ?? p.question)).size).toBe(10)
+        expect(round.filter((p) => p.story)).toHaveLength(3)
       }
     }
   })

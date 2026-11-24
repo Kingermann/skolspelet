@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { ROUND_LENGTH } from '../game/config'
 import { celebrateCorrect } from '../game/celebrate'
-import { fmt, generateRound, makeChoices, shuffle } from '../game/generator'
+import { fmt, makeChoices, shuffle } from '../game/generator'
+import { generateRound } from '../game/round'
 import { LEVEL_INFO, OP_INFO } from '../game/labels'
 import { sounds } from '../game/sound'
 import type { Grade, Level, OpChoice, Problem } from '../game/types'
@@ -193,11 +194,20 @@ export function Round({ grade, level, op, onFinish, onQuit }: Props) {
       </div>
 
       <div className={`card phase-${phase}`} key={`${index}-${attempts}`}>
-        <div className={`problem ${long ? 'problem-long' : ''}`}>
-          {before}
-          <span className={`slot ${input && !done ? 'slot-filled' : ''}`}>{slot}</span>
-          {after}
-        </div>
+        {problem.story ? (
+          <>
+            <p className="story">{problem.story}</p>
+            <div className="story-answer">
+              <span className={`slot ${input && !done ? 'slot-filled' : ''}`}>{slot}</span> {problem.answerLabel}
+            </div>
+          </>
+        ) : (
+          <div className={`problem ${long ? 'problem-long' : ''}`}>
+            {before}
+            <span className={`slot ${input && !done ? 'slot-filled' : ''}`}>{slot}</span>
+            {after}
+          </div>
+        )}
         <div className="message">{message}</div>
         {phase === 'correct' && streak >= 2 && <div className="streak">🔥 {streak} rätt i rad!</div>}
         {phase === 'reveal' && <div className="solution">{problem.solution}</div>}

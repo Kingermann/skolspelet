@@ -1,4 +1,4 @@
-import { CONFIG, ROUND_LENGTH, opsForGrade } from './config'
+import { CONFIG, opsForGrade } from './config'
 import type {
   AddSpec,
   DivSpec,
@@ -19,7 +19,7 @@ export function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-function chance(p = 0): boolean {
+export function chance(p = 0): boolean {
   return Math.random() < p
 }
 
@@ -57,13 +57,13 @@ export function fmt(n: number): string {
 
 const SYMBOL: Record<Op, string> = { '+': '+', '-': '−', '×': '×', '÷': '÷' }
 
-function expr(...parts: (number | string)[]): string {
+export function expr(...parts: (number | string)[]): string {
   return parts
     .map((p) => (typeof p === 'number' ? fmt(p) : (SYMBOL[p as Op] ?? p)))
     .join(' ')
 }
 
-function makeProblem(template: string, answer: number, mistakes: number[], unit = 1): Problem {
+export function makeProblem(template: string, answer: number, mistakes: number[], unit = 1): Problem {
   return {
     question: template,
     answer,
@@ -104,25 +104,17 @@ function matches(rule: 'no' | 'yes' | 'any' | undefined, has: boolean): boolean 
 
 // ---------- Generatorer per räknesätt ----------
 
-function genAdd(spec: AddSpec): Problem {
+// ---------- Talval (används både av vanliga uppgifter och textuppgifter) ----------
+
+function scale(spec: { max: number; step?: number }) {
   const step = spec.step ?? 1
   const max = Math.floor(spec.max / step)
-  const min = Math.max(1, Math.floor(max / 100))
-  const s = (n: number) => n * step
+  return { step, max, min: Math.max(1, Math.floor(max / 100)) }
+}
 
-  if (chance(spec.threeTermsChance)) {
-    const sum = randInt(3 * min, max)
-    const a = randInt(min, sum - 2 * min)
-    const b = randInt(min, sum - a - min)
-    const c = sum - a - b
-    return makeProblem(expr(s(a), '+', s(b), '+', s(c), '=', '?'), s(sum), [
-      s(sum) + 1,
-      s(sum) - 1,
-      s(sum) + 10 * step,
-      s(sum) - 10 * step,
-    ], step)
-  }
-
+/** Två termer a + b inom talområdet (och med/utan tiotalsövergång enligt spec). */
+export function pickAddPair(spec: AddSpec): [number, number] {
+  const { step, max, min } = scale(spec)
   const [a, b] = tryUntil(
     () => {
       const sum = randInt(2 * min, max)
@@ -131,30 +123,108 @@ function genAdd(spec: AddSpec): Problem {
     },
     ([a, b]) => matches(spec.carry, hasCarry(a, b)),
   )
-  const sum = s(a + b)
+  return [a * step, b * step]
+}
+
+/** a − b där a > b, inom talområdet (och med/utan växling enligt spec). */
+export function pickSubPair(spec: SubSpec): [number, number] {
+  const { step, max, min } = scale(spec)
+  const [a, b] = tryUntil(
+    () => {
+      const a = randInt(2 * min, max)
+      return [a, randInt(min, a - min)] as const
+    },
+    ([a, b]) => matches(spec.borrow, hasBorrow(a, b)),
+  )
+  return [a * step, b * step]
+}
+
+export function pickMulPair(spec: MulSpec): [number, number] {
+  const a = pick(spec.a)
+  const b = pick(spec.b)
+  return chance(0.5) ? [b, a] : [a, b]
+}
+
+/** [tal, nämnare, kvot] där divisionen alltid går jämnt ut. */
+export function pickDivTriple(spec: DivSpec): [number, number, number] {
+  const d = pick(spec.divisor)
+  const q = pick(spec.quotient)
+  return [d * q, d, q]
+}
+
+// ---------- Enkla uppgifter "a ○ b = ?" med smarta fel ----------
+
+export function plainAdd(a: number, b: number, step = 1): Problem {
+  const sum = a + b
+  return makeProblem(expr(a, '+', b, '=', '?'), sum, [
+    sum + step,
+    sum - step,
+    sum + 10 * step,
+    sum - 10 * step,
+    Math.abs(a - b),
+  ], step)
+}
+
+export function plainSub(a: number, b: number, step = 1): Problem {
+  const d = a - b
+  return makeProblem(expr(a, '-', b, '=', '?'), d, [d + step, d - step, d + 10 * step, d - 10 * step, a + b], step)
+}
+
+export function plainMul(a: number, b: number): Problem {
+  const p = a * b
+  if (isPowerOfTen(a) || isPowerOfTen(b)) {
+    // 37 × 100: vanliga fel är en nolla för mycket eller för lite
+    const ten = isPowerOfTen(b) ? b : a
+    return makeProblem(expr(a, '×', b, '=', '?'), p, [p * 10, p / 10, p + ten, p - ten], ten)
+  }
+  return makeProblem(expr(a, '×', b, '=', '?'), p, [a + b, p + a, p - a, p + b, p - b, p + 1, p - 1, p + 10])
+}
+
+export function plainDiv(n: number, d: number): Problem {
+  const q = n / d
+  if (isPowerOfTen(d)) {
+    // 4500 ÷ 100: vanliga fel är en nolla för mycket eller för lite
+    return makeProblem(expr(n, '÷', d, '=', '?'), q, [q * 10, q / 10, n / 10, q + 1, q - 1])
+  }
+  return makeProblem(expr(n, '÷', d, '=', '?'), q, [q + 1, q - 1, q + d, n - d, q + 10, d])
+}
+
+// ---------- Generatorer per räknesätt ----------
+
+function genAdd(spec: AddSpec): Problem {
+  const { step, max, min } = scale(spec)
+  const s = (n: number) => n * step
+
+  if (chance(spec.threeTermsChance)) {
+    const sum = randInt(3 * min, max)
+    const a = randInt(min, sum - 2 * min)
+    const b = randInt(min, sum - a - min)
+    const c = sum - a - b
+    return makeProblem(expr(s(a), '+', s(b), '+', s(c), '=', '?'), s(sum), [
+      s(sum) + step,
+      s(sum) - step,
+      s(sum) + 10 * step,
+      s(sum) - 10 * step,
+    ], step)
+  }
+
+  const [a, b] = pickAddPair(spec)
+  const sum = a + b
 
   if (chance(spec.missingChance)) {
     // 3 + ? = 11  eller  ? + 8 = 11
     const hideFirst = chance(0.3)
-    const known = hideFirst ? s(b) : s(a)
-    const hidden = hideFirst ? s(a) : s(b)
+    const known = hideFirst ? b : a
+    const hidden = hideFirst ? a : b
     const template = hideFirst ? expr('?', '+', known, '=', sum) : expr(known, '+', '?', '=', sum)
     return makeProblem(template, hidden, [sum + known, hidden + step, hidden - step, hidden + 10 * step, sum], step)
   }
 
-  return makeProblem(expr(s(a), '+', s(b), '=', '?'), sum, [
-    sum + 1,
-    sum - 1,
-    sum + 10 * step,
-    sum - 10 * step,
-    Math.abs(s(a) - s(b)),
-  ], step)
+  return plainAdd(a, b, step)
 }
 
 function genSub(spec: SubSpec): Problem {
-  const step = spec.step ?? 1
-  const max = Math.floor(spec.max / step)
-  const min = Math.max(1, Math.floor(max / 100))
+  const { step, max, min } = scale(spec)
   const s = (n: number) => n * step
 
   if (chance(spec.threeTermsChance)) {
@@ -163,44 +233,30 @@ function genSub(spec: SubSpec): Problem {
     const c = randInt(min, a - b - min)
     const d = s(a - b - c)
     return makeProblem(expr(s(a), '-', s(b), '-', s(c), '=', '?'), d, [
-      d + 1,
-      d - 1,
+      d + step,
+      d - step,
       s(a - b + c),
       d + 10 * step,
     ], step)
   }
 
-  const [a, b] = tryUntil(
-    () => {
-      const a = randInt(2 * min, max)
-      return [a, randInt(min, a - min)] as const
-    },
-    ([a, b]) => matches(spec.borrow, hasBorrow(a, b)),
-  )
-  const d = s(a - b)
+  const [a, b] = pickSubPair(spec)
+  const d = a - b
 
   if (chance(spec.missingChance)) {
     if (chance(0.5)) {
       // 12 − ? = 5
-      return makeProblem(expr(s(a), '-', '?', '=', d), s(b), [s(a) + d, d, s(b) + step, s(b) - step], step)
+      return makeProblem(expr(a, '-', '?', '=', d), b, [a + d, d, b + step, b - step], step)
     }
     // ? − 7 = 5
-    return makeProblem(expr('?', '-', s(b), '=', d), s(a), [Math.abs(d - s(b)), s(a) + step, s(a) - step, s(a) + 10 * step], step)
+    return makeProblem(expr('?', '-', b, '=', d), a, [Math.abs(d - b), a + step, a - step, a + 10 * step], step)
   }
 
-  return makeProblem(expr(s(a), '-', s(b), '=', '?'), d, [
-    d + 1,
-    d - 1,
-    d + 10 * step,
-    d - 10 * step,
-    s(a + b),
-  ], step)
+  return plainSub(a, b, step)
 }
 
 function genMul(spec: MulSpec): Problem {
-  let a = pick(spec.a)
-  let b = pick(spec.b)
-  if (chance(0.5)) [a, b] = [b, a]
+  const [a, b] = pickMulPair(spec)
   const p = a * b
 
   if (chance(spec.missingChance)) {
@@ -208,35 +264,13 @@ function genMul(spec: MulSpec): Problem {
     return makeProblem(expr(a, '×', '?', '=', p), b, [b + 1, b - 1, p - a, a, b + 2])
   }
 
-  if (isPowerOfTen(a) || isPowerOfTen(b)) {
-    // 37 × 100: vanliga fel är en nolla för mycket eller för lite
-    const ten = isPowerOfTen(b) ? b : a
-    return makeProblem(expr(a, '×', b, '=', '?'), p, [p * 10, p / 10, p + ten, p - ten], ten)
-  }
-
-  return makeProblem(expr(a, '×', b, '=', '?'), p, [
-    a + b,
-    p + a,
-    p - a,
-    p + b,
-    p - b,
-    p + 1,
-    p - 1,
-    p + 10,
-  ])
+  return plainMul(a, b)
 }
 
 function genDiv(spec: DivSpec): Problem {
-  const d = pick(spec.divisor)
-  const q = pick(spec.quotient)
-  const n = d * q
+  const [n, d, q] = pickDivTriple(spec)
 
-  if (isPowerOfTen(d)) {
-    // 4500 ÷ 100: vanliga fel är en nolla för mycket eller för lite
-    return makeProblem(expr(n, '÷', d, '=', '?'), q, [q * 10, q / 10, n / 10, q + 1, q - 1])
-  }
-
-  if (chance(spec.missingChance)) {
+  if (!isPowerOfTen(d) && chance(spec.missingChance)) {
     if (chance(0.5)) {
       // ? ÷ 6 = 7
       return makeProblem(expr('?', '÷', d, '=', q), n, [n + d, n - d, q + d, n + 1, n - 1])
@@ -245,7 +279,7 @@ function genDiv(spec: DivSpec): Problem {
     return makeProblem(expr(n, '÷', '?', '=', q), d, [d + 1, d - 1, n - q, q])
   }
 
-  return makeProblem(expr(n, '÷', d, '=', '?'), q, [q + 1, q - 1, q + d, n - d, q + 10, d])
+  return plainDiv(n, d)
 }
 
 function genPrio(spec: PrioSpec, op: Op): Problem {
@@ -344,25 +378,6 @@ export function generateProblem(grade: Grade, level: Level, choice: OpChoice): P
     case 'prio':
       return genPrio(spec, op)
   }
-}
-
-/** En runda med unika uppgifter (så långt det går). */
-export function generateRound(
-  grade: Grade,
-  level: Level,
-  choice: OpChoice,
-  length = ROUND_LENGTH,
-): Problem[] {
-  const round: Problem[] = []
-  const seen = new Set<string>()
-  for (let tries = 0; round.length < length && tries < length * 50; tries++) {
-    const p = generateProblem(grade, level, choice)
-    if (seen.has(p.question)) continue
-    seen.add(p.question)
-    round.push(p)
-  }
-  while (round.length < length) round.push(generateProblem(grade, level, choice))
-  return round
 }
 
 /** Fyra svarsalternativ (för Lätt): rätt svar + tre "smarta" fel. */

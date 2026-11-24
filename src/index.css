@@ -320,6 +320,20 @@ button:disabled {
   font-size: min(8.5vw, 38px);
 }
 
+.story {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.story-answer {
+  margin-top: 14px;
+  font-size: 34px;
+  font-weight: 700;
+}
+
 .slot {
   display: inline-block;
   min-width: 1.4em;

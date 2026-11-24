@@ -126,3 +126,6 @@ export function opsForGrade(grade: Grade): Op[] {
 }
 
 export const ROUND_LENGTH = 10
+
+/** Hur många av rundans uppgifter som är textuppgifter ("Per har 2 äpplen…"). */
+export const STORIES_PER_ROUND = 3
