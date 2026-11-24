@@ -3,11 +3,14 @@ import { CATEGORIES } from './categories'
 import type { Category } from './categories/types'
 import { AlbumScreen, StartScreen } from './components/Menus'
 import { Result } from './components/Result'
+import { SettingsScreen } from './components/SettingsScreen'
 import { SoundContext } from './components/SoundContext'
+import { DEFAULT_ROUND_LENGTH } from './game/constants'
+import { GameSettingsContext } from './game/gameSettings'
 import { setSoundEnabled, sounds } from './game/sound'
 import { pickSticker, type Sticker } from './game/stickers'
 
-type Screen = 'start' | 'setup' | 'play' | 'result' | 'album'
+type Screen = 'start' | 'setup' | 'play' | 'result' | 'album' | 'settings'
 
 /**
  * Skolspelet: startskärm → kategori (egna val) → runda → resultat.
@@ -19,7 +22,9 @@ export default function App() {
   const [settings, setSettings] = useState<unknown>(null)
   const [playId, setPlayId] = useState(0)
   const [album, setAlbum] = useState<string[]>([])
-  const [result, setResult] = useState<{ firstTryCorrect: number; sticker: Sticker } | null>(null)
+  const [result, setResult] = useState<{ firstTryCorrect: number; total: number; sticker: Sticker } | null>(null)
+  const [roundLength, setRoundLength] = useState(DEFAULT_ROUND_LENGTH)
+  const gameSettings = useMemo(() => ({ roundLength, setRoundLength }), [roundLength])
   const [albumBack, setAlbumBack] = useState<Screen>('start')
   const [soundOn, setSoundOn] = useState(true)
 
@@ -41,10 +46,10 @@ export default function App() {
     setScreen('play')
   }
 
-  function finish(firstTryCorrect: number) {
+  function finish(firstTryCorrect: number, total: number) {
     const sticker = pickSticker(album)
     setAlbum((a) => [...a, sticker.id])
-    setResult({ firstTryCorrect, sticker })
+    setResult({ firstTryCorrect, total, sticker })
     setScreen('result')
   }
 
@@ -57,30 +62,34 @@ export default function App() {
 
   return (
     <SoundContext.Provider value={sound}>
-      <main className="app">
-        {screen === 'start' && (
-          <StartScreen
-            categories={CATEGORIES}
-            albumCount={new Set(album).size}
-            onPick={(c) => {
-              setCategory(c)
-              setScreen('setup')
-            }}
-            onAlbum={() => openAlbum('start')}
-          />
-        )}
-        {screen === 'setup' && <Setup key={category.id} onStart={play} onBack={() => setScreen('start')} />}
-        {screen === 'play' && <Play key={playId} settings={settings} onFinish={finish} onQuit={() => setScreen('start')} />}
-        {screen === 'result' && result && (
-          <Result
-            {...result}
-            onAgain={() => play(settings)}
-            onHome={() => setScreen('start')}
-            onAlbum={() => openAlbum('result')}
-          />
-        )}
-        {screen === 'album' && <AlbumScreen album={album} onBack={() => setScreen(albumBack)} />}
-      </main>
+      <GameSettingsContext.Provider value={gameSettings}>
+        <main className="app">
+          {screen === 'start' && (
+            <StartScreen
+              categories={CATEGORIES}
+              albumCount={new Set(album).size}
+              onPick={(c) => {
+                setCategory(c)
+                setScreen('setup')
+              }}
+              onAlbum={() => openAlbum('start')}
+              onSettings={() => setScreen('settings')}
+            />
+          )}
+          {screen === 'settings' && <SettingsScreen onBack={() => setScreen('start')} />}
+          {screen === 'setup' && <Setup key={category.id} onStart={play} onBack={() => setScreen('start')} />}
+          {screen === 'play' && <Play key={playId} settings={settings} onFinish={finish} onQuit={() => setScreen('start')} />}
+          {screen === 'result' && result && (
+            <Result
+              {...result}
+              onAgain={() => play(settings)}
+              onHome={() => setScreen('start')}
+              onAlbum={() => openAlbum('result')}
+            />
+          )}
+          {screen === 'album' && <AlbumScreen album={album} onBack={() => setScreen(albumBack)} />}
+        </main>
+      </GameSettingsContext.Provider>
     </SoundContext.Provider>
   )
 }

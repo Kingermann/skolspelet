@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Header } from '../../components/Header'
 import { Progress } from '../../components/Progress'
+import { useGameSettings } from '../../game/gameSettings'
 import { LEVEL_STYLE, type Level } from '../../game/levels'
 import { useRoundFlow } from '../../game/useRoundFlow'
 import { CONTINENTS } from './countries'
@@ -12,7 +13,7 @@ import { WorldMap } from './WorldMap'
 
 interface Props {
   settings: GeoSettings
-  onFinish: (firstTryCorrect: number) => void
+  onFinish: (firstTryCorrect: number, total: number) => void
   onQuit: () => void
 }
 
@@ -63,12 +64,13 @@ interface GameProps {
   map: ContinentMap
   level: Level
   header: React.ReactNode
-  onFinish: (n: number) => void
+  onFinish: (firstTryCorrect: number, total: number) => void
 }
 
 function MapGame({ map, level, header, onFinish }: GameProps) {
+  const { roundLength } = useGameSettings()
   const flow = useRoundFlow<MapShape>({
-    makeItems: () => pickRoundCountries(map.shapes.filter((s) => s.kind === 'country'), level),
+    makeItems: () => pickRoundCountries(map.shapes.filter((s) => s.kind === 'country'), level, roundLength),
     onFinish,
   })
   const [found, setFound] = useState<Set<string>>(() => new Set())
@@ -105,7 +107,7 @@ function MapGame({ map, level, header, onFinish }: GameProps) {
   return (
     <div className="screen round map-round">
       {header}
-      <Progress marks={flow.marks} index={flow.index} isRetake={flow.isRetake} />
+      <Progress marks={flow.marks} index={flow.index} />
 
       <div className={`card map-card phase-${flow.phase}`} key={`${flow.index}-${flow.attempts}`}>
         <div className="map-question">

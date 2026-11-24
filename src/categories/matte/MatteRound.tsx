@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Header } from '../../components/Header'
 import { Progress } from '../../components/Progress'
+import { useGameSettings } from '../../game/gameSettings'
 import { sounds } from '../../game/sound'
 import { useRoundFlow, type RoundFlow } from '../../game/useRoundFlow'
 import { fmt, makeChoices, shuffle } from './generator'
@@ -26,7 +27,7 @@ const MAX_DIGITS = 7
 
 interface Props {
   settings: MatteSettings
-  onFinish: (firstTryCorrect: number) => void
+  onFinish: (firstTryCorrect: number, total: number) => void
   onQuit: () => void
 }
 
@@ -34,11 +35,11 @@ export function MatteRound({ settings, onFinish, onQuit }: Props) {
   const { grade, level, op } = settings
   const isEasy = level === 'latt'
   const toItem = (problem: Problem): Item => ({ problem, choices: isEasy ? makeChoices(problem) : [] })
+  const { roundLength } = useGameSettings()
 
   const flow = useRoundFlow<Item>({
-    makeItems: () => generateRound(grade, level, op).map(toItem),
+    makeItems: () => generateRound(grade, level, op, roundLength).map(toItem),
     onFinish,
-    remake: (item) => toItem(item.problem),
   })
 
   return (
@@ -54,7 +55,7 @@ export function MatteRound({ settings, onFinish, onQuit }: Props) {
         <span className="chip">{OP_INFO[op].icon}</span>
         <span className="chip">{LEVEL_STYLE[level].label}</span>
       </Header>
-      <Progress marks={flow.marks} index={flow.index} isRetake={flow.isRetake} />
+      <Progress marks={flow.marks} index={flow.index} />
       {/* Ny nyckel per fråga ⇒ inmatning, 50/50 m.m. nollställs automatiskt. */}
       <MathQuestion key={flow.index} flow={flow} isEasy={isEasy} />
     </div>

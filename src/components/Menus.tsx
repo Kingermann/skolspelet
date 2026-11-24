@@ -11,12 +11,13 @@ interface StartProps {
   albumCount: number
   onPick: (category: Category<unknown>) => void
   onAlbum: () => void
+  onSettings: () => void
 }
 
-export function StartScreen({ categories, albumCount, onPick, onAlbum }: StartProps) {
+export function StartScreen({ categories, albumCount, onPick, onAlbum, onSettings }: StartProps) {
   return (
     <div className="screen">
-      <Header />
+      <Header onBack={onSettings} backIcon="⚙️" backLabel="Inställningar" />
       <div className="start">
         <div className="logo" aria-hidden>
           <span>🎒</span>

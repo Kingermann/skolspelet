@@ -1,9 +1,13 @@
-/** Antal uppgifter/frågor i en runda (omtag kommer utöver dessa). */
-export const ROUND_LENGTH = 10
+/** Antal frågor per runda om man inte ändrat i inställningarna. */
+export const DEFAULT_ROUND_LENGTH = 10
 
-/** Stjärnor räknas på rätt vid första försöket. */
-export function starsFor(firstTryCorrect: number): 1 | 2 | 3 {
-  if (firstTryCorrect >= 9) return 3
-  if (firstTryCorrect >= 6) return 2
+/** Valen i inställningarna för antal frågor per runda. */
+export const ROUND_LENGTH_OPTIONS = [3, 5, 10, 15, 20]
+
+/** Stjärnor räknas på andel rätt vid första försöket: 90 % ⇒ 3, 60 % ⇒ 2, annars 1. */
+export function starsFor(firstTryCorrect: number, total: number): 1 | 2 | 3 {
+  const share = total > 0 ? firstTryCorrect / total : 0
+  if (share >= 0.9) return 3
+  if (share >= 0.6) return 2
   return 1
 }

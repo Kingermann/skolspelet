@@ -185,6 +185,16 @@ describe.each(allCombos())('textuppgifter åk %i, %s, %s', (grade, level, op) =>
 })
 
 describe('generateRound', () => {
+  it.each([3, 5, 15, 20])('%i uppgifter per runda, varav ca 30 %% textuppgifter', (length) => {
+    for (const grade of GRADES) {
+      for (const level of LEVELS) {
+        const round = generateRound(grade, level, 'mix', length)
+        expect(round).toHaveLength(length)
+        expect(round.filter((p) => p.story)).toHaveLength(Math.round(length * 0.3))
+      }
+    }
+  })
+
   it('ger 10 unika uppgifter varav 3 textuppgifter', () => {
     for (const grade of GRADES) {
       for (const level of LEVELS) {

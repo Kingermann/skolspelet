@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { describe, expect, it } from 'vitest'
-import { ROUND_LENGTH } from '../../game/constants'
+import { DEFAULT_ROUND_LENGTH as ROUND_LENGTH } from '../../game/constants'
 import { COUNTRIES, CONTINENTS, IGNORED, MERGED_INTO, TERRITORIES, type Continent } from './countries'
 import { buildContinentMap } from './map'
 import { pickRoundCountries } from './round'
@@ -163,6 +163,21 @@ describe('nivåer', () => {
     const medium = levelOf(pickRoundCountries(countries, 'medel'))
     expect(count(medium, 2)).toBe(4)
     expect(count(medium, 1)).toBe(6)
+  })
+})
+
+describe('antal frågor per runda', () => {
+  it('ger valt antal olika länder, eller alla länder om världsdelen har färre', () => {
+    for (const continent of ALL_CONTINENTS) {
+      const all = countriesIn(continent)
+      for (const length of [3, 5, 10, 15, 20]) {
+        for (const level of LEVELS) {
+          const round = pickRoundCountries(all, level, length)
+          expect(round).toHaveLength(Math.min(length, all.length))
+          expect(new Set(round.map((c) => c.id)).size).toBe(round.length)
+        }
+      }
+    }
   })
 })
 

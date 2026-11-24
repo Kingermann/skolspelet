@@ -279,9 +279,14 @@ button:disabled {
   background: var(--orange);
 }
 
-.retake-label {
-  font-weight: 600;
-  color: var(--primary-dark);
+/* Många frågor ⇒ mindre prickar så att de får plats på telefonen. */
+.progress-many {
+  gap: 5px;
+}
+
+.progress-many .dot {
+  width: 11px;
+  height: 11px;
 }
 
 .card {
@@ -978,4 +983,31 @@ button:disabled {
 
 .tile-mode .tile-big {
   font-size: 30px;
+}
+
+/* ---------- Inställningar ---------- */
+.length-options {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.length-option {
+  aspect-ratio: 1;
+  border-radius: 20px;
+  background: white;
+  font-size: 30px;
+  font-weight: 700;
+  box-shadow: 0 5px 0 rgba(43, 34, 80, 0.18);
+  transition: transform 0.08s;
+}
+
+.length-option:active {
+  transform: translateY(3px);
+}
+
+.length-option.selected {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 5px 0 var(--primary-dark);
 }

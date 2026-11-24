@@ -5,8 +5,8 @@ import { sounds } from './sound'
 
 /**
  * Gemensam logik för en spelrunda, oavsett kategori:
- * två försök per fråga, visa svaret efter två fel, omtag av missade frågor,
- * stjärnor på första försöket, "rätt i rad" och firande med konfetti + applåder.
+ * två försök per fråga, visa svaret efter två fel, stjärnor på första
+ * försöket, "rätt i rad" och firande med konfetti + applåder.
  */
 
 export type Phase = 'answering' | 'retry' | 'correct' | 'reveal'
@@ -17,36 +17,25 @@ const PRAISE = ['Rätt! 🎉', 'Snyggt! ⭐', 'Grymt! 🚀', 'Wow! 🌟', 'Perfe
 /** Hur länge man får njuta av firandet innan nästa fråga kommer (millisekunder). */
 const CELEBRATION_MS = 1600
 
-interface QueueItem<T> {
-  value: T
-  /** Ett "omtag" av en fråga man missat – ger ingen stjärna. */
-  retake: boolean
-}
-
 interface Options<T> {
   /** Skapar rundans frågor (anropas en gång). */
   makeItems: () => T[]
-  onFinish: (firstTryCorrect: number) => void
-  /** Gör om en fråga inför omtaget (t.ex. blanda svarsalternativen på nytt). */
-  remake?: (item: T) => T
+  /** Anropas när rundan är slut: antal rätt på första försöket och antal frågor. */
+  onFinish: (firstTryCorrect: number, total: number) => void
 }
 
-export function useRoundFlow<T>({ makeItems, onFinish, remake = (v) => v }: Options<T>) {
-  const [queue, setQueue] = useState<QueueItem<T>[]>(() => makeItems().map((value) => ({ value, retake: false })))
+export function useRoundFlow<T>({ makeItems, onFinish }: Options<T>) {
+  const [items] = useState<T[]>(makeItems)
   const [index, setIndex] = useState(0)
   const [attempts, setAttempts] = useState(0)
   const [phase, setPhase] = useState<Phase>('answering')
-  const [marks, setMarks] = useState<Mark[]>(() => queue.map(() => 'pending'))
+  const [marks, setMarks] = useState<Mark[]>(() => items.map(() => 'pending'))
   const [message, setMessage] = useState('')
   const [streak, setStreak] = useState(0)
 
-  const current = queue[index]
   const done = phase === 'correct' || phase === 'reveal'
 
-  const mark = (m: Mark) => {
-    if (current.retake) return
-    setMarks((prev) => prev.map((old, i) => (i === index ? m : old)))
-  }
+  const mark = (m: Mark) => setMarks((prev) => prev.map((old, i) => (i === index ? m : old)))
 
   /** Rätt svar: firande, stjärnmarkering och automatiskt vidare. */
   function correct() {
@@ -62,10 +51,7 @@ export function useRoundFlow<T>({ makeItems, onFinish, remake = (v) => v }: Opti
     mark(attempts === 0 ? 'first' : 'later')
   }
 
-  /**
-   * Fel svar. Första gången: försök igen. Andra gången: visa svaret,
-   * och frågan kommer tillbaka som omtag i slutet av rundan.
-   */
+  /** Fel svar. Första gången: försök igen. Andra gången: visa svaret. */
   function wrong(retryMessage: string, revealMessage: string) {
     if (done) return
     sounds.wrong()
@@ -78,18 +64,17 @@ export function useRoundFlow<T>({ makeItems, onFinish, remake = (v) => v }: Opti
       setPhase('reveal')
       setMessage(revealMessage)
       mark('missed')
-      if (!current.retake) setQueue((prev) => [...prev, { value: remake(current.value), retake: true }])
     }
   }
 
   function advance() {
-    if (index + 1 < queue.length) {
+    if (index + 1 < items.length) {
       setIndex(index + 1)
       setAttempts(0)
       setPhase('answering')
       setMessage('')
     } else {
-      onFinish(marks.filter((m) => m === 'first').length)
+      onFinish(marks.filter((m) => m === 'first').length, items.length)
     }
   }
 
@@ -101,8 +86,7 @@ export function useRoundFlow<T>({ makeItems, onFinish, remake = (v) => v }: Opti
   })
 
   return {
-    item: current.value,
-    isRetake: current.retake,
+    item: items[index],
     index,
     attempts,
     phase,

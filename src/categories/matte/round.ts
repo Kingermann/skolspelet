@@ -1,4 +1,5 @@
-import { ROUND_LENGTH, STORIES_PER_ROUND } from './config'
+import { DEFAULT_ROUND_LENGTH } from '../../game/constants'
+import { STORY_SHARE } from './config'
 import { generateProblem, shuffle } from './generator'
 import { generateStory } from './stories'
 import type { Grade, Level, OpChoice, Problem } from './types'
@@ -11,8 +12,8 @@ export function generateRound(
   grade: Grade,
   level: Level,
   choice: OpChoice,
-  length = ROUND_LENGTH,
-  stories = STORIES_PER_ROUND,
+  length = DEFAULT_ROUND_LENGTH,
+  stories = Math.round(length * STORY_SHARE),
 ): Problem[] {
   const storySlots = new Set(shuffle([...Array(length).keys()]).slice(0, stories))
   const key = (p: Problem) => p.story ?? p.question

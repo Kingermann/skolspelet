@@ -17,8 +17,8 @@ export interface Category<Settings> {
   color: string
   /** Valen innan rundan (t.ex. årskurs och nivå). Anropar onStart när allt är valt. */
   Setup: ComponentType<{ onStart: (settings: Settings) => void; onBack: () => void }>
-  /** Själva rundan. Anropar onFinish med antal rätt på första försöket. */
-  Play: ComponentType<{ settings: Settings; onFinish: (firstTryCorrect: number) => void; onQuit: () => void }>
+  /** Själva rundan. Anropar onFinish med antal rätt på första försöket och antal frågor. */
+  Play: ComponentType<{ settings: Settings; onFinish: (firstTryCorrect: number, total: number) => void; onQuit: () => void }>
 }
 
 /** Gör en kategori med egna inställningar till en "vanlig" kategori som App kan hantera. */

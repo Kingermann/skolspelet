@@ -1,4 +1,4 @@
-import { ROUND_LENGTH } from '../../game/constants'
+import { DEFAULT_ROUND_LENGTH } from '../../game/constants'
 import type { Level } from '../../game/levels'
 import { shuffle } from '../../game/random'
 import { COUNTRIES, type CountryLevel } from './countries'
@@ -16,7 +16,7 @@ const FILL_ORDER: Record<CountryLevel, CountryLevel[]> = {
 }
 
 /** Väljer rundans länder: i första hand från vald nivå. */
-export function pickRoundCountries<T extends { id: string }>(countries: T[], level: Level, length = ROUND_LENGTH): T[] {
+export function pickRoundCountries<T extends { id: string }>(countries: T[], level: Level, length = DEFAULT_ROUND_LENGTH): T[] {
   const picked: T[] = []
   for (const tier of FILL_ORDER[TIER[level]]) {
     const pool = shuffle(countries.filter((c) => COUNTRIES[c.id]?.level === tier))

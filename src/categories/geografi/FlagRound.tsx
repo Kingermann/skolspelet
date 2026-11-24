@@ -2,6 +2,7 @@ import 'flag-icons/css/flag-icons.min.css'
 import { useEffect, useRef, useState } from 'react'
 import { Header } from '../../components/Header'
 import { Progress } from '../../components/Progress'
+import { useGameSettings } from '../../game/gameSettings'
 import { LEVEL_STYLE } from '../../game/levels'
 import { useRoundFlow, type RoundFlow } from '../../game/useRoundFlow'
 import { CONTINENTS } from './countries'
@@ -28,7 +29,7 @@ export function Flag({ iso, className = '' }: { iso: string; className?: string 
 
 interface Props {
   settings: GeoSettings
-  onFinish: (firstTryCorrect: number) => void
+  onFinish: (firstTryCorrect: number, total: number) => void
   onQuit: () => void
 }
 
@@ -37,12 +38,12 @@ export function FlagRound({ settings, onFinish, onQuit }: Props) {
   const { continent, level } = settings
   const info = CONTINENTS[continent]
   const all = countriesIn(continent)
+  const { roundLength } = useGameSettings()
   const toItem = (country: FlagCountry): Item => ({ country, options: makeFlagOptions(country, all, level) })
 
   const flow = useRoundFlow<Item>({
-    makeItems: () => pickRoundCountries(all, level).map(toItem),
+    makeItems: () => pickRoundCountries(all, level, roundLength).map(toItem),
     onFinish,
-    remake: (item) => toItem(item.country),
   })
 
   return (
@@ -57,7 +58,7 @@ export function FlagRound({ settings, onFinish, onQuit }: Props) {
         <span className="chip">🚩 {info.name}</span>
         <span className="chip">{LEVEL_STYLE[level].label}</span>
       </Header>
-      <Progress marks={flow.marks} index={flow.index} isRetake={flow.isRetake} />
+      <Progress marks={flow.marks} index={flow.index} />
       <FlagQuestion key={flow.index} flow={flow} />
     </div>
   )

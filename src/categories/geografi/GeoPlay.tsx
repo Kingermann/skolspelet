@@ -6,7 +6,7 @@ export type { GeoSettings } from './settings'
 
 interface Props {
   settings: GeoSettings
-  onFinish: (firstTryCorrect: number) => void
+  onFinish: (firstTryCorrect: number, total: number) => void
   onQuit: () => void
 }
 
