@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Header } from '../../components/Header'
 import { Progress } from '../../components/Progress'
-import { ROUND_LENGTH } from '../../game/constants'
-import { shuffle } from '../../game/random'
+import { LEVEL_STYLE, type Level } from '../../game/levels'
 import { useRoundFlow } from '../../game/useRoundFlow'
 import { CONTINENTS, type Continent } from './countries'
 import { buildContinentMap, loadTopology, type ContinentMap, type MapShape } from './map'
+import { pickRoundCountries } from './round'
 import { WorldMap } from './WorldMap'
 
 export interface GeoSettings {
   continent: Continent
+  level: Level
 }
 
 interface Props {
@@ -33,7 +34,7 @@ export function MapRound({ settings, onFinish, onQuit }: Props) {
     }
   }, [settings.continent])
 
-  const header = <RoundHeader continent={settings.continent} onQuit={onQuit} />
+  const header = <RoundHeader settings={settings} onQuit={onQuit} />
   if (!map) {
     return (
       <div className="screen round">
@@ -42,11 +43,11 @@ export function MapRound({ settings, onFinish, onQuit }: Props) {
       </div>
     )
   }
-  return <MapGame map={map} header={header} onFinish={onFinish} />
+  return <MapGame map={map} level={settings.level} header={header} onFinish={onFinish} />
 }
 
-function RoundHeader({ continent, onQuit }: { continent: Continent; onQuit: () => void }) {
-  const info = CONTINENTS[continent]
+function RoundHeader({ settings, onQuit }: { settings: GeoSettings; onQuit: () => void }) {
+  const info = CONTINENTS[settings.continent]
   return (
     <Header
       onBack={() => {
@@ -58,13 +59,21 @@ function RoundHeader({ continent, onQuit }: { continent: Continent; onQuit: () =
       <span className="chip">
         {info.icon} {info.name}
       </span>
+      <span className="chip">{LEVEL_STYLE[settings.level].label}</span>
     </Header>
   )
 }
 
-function MapGame({ map, header, onFinish }: { map: ContinentMap; header: React.ReactNode; onFinish: (n: number) => void }) {
+interface GameProps {
+  map: ContinentMap
+  level: Level
+  header: React.ReactNode
+  onFinish: (n: number) => void
+}
+
+function MapGame({ map, level, header, onFinish }: GameProps) {
   const flow = useRoundFlow<MapShape>({
-    makeItems: () => shuffle(map.shapes.filter((s) => s.kind === 'country')).slice(0, ROUND_LENGTH),
+    makeItems: () => pickRoundCountries(map.shapes.filter((s) => s.kind === 'country'), level),
     onFinish,
   })
   const [found, setFound] = useState<Set<string>>(() => new Set())

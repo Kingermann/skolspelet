@@ -1,5 +1,5 @@
 export type Grade = 1 | 2 | 3 | 4 | 5 | 6
-export type Level = 'latt' | 'medel' | 'svar'
+export type { Level } from '../../game/levels'
 export type Op = '+' | '-' | '×' | '÷'
 export type OpChoice = Op | 'mix'
 

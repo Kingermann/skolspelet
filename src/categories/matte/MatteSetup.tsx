@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { Header } from '../../components/Header'
 import { tap } from '../../components/tap'
 import { opsForGrade } from './config'
-import { LEVEL_INFO, OP_INFO } from './labels'
+import { LevelScreen } from '../../components/LevelScreen'
+import { LEVEL_TEXTS, OP_INFO } from './labels'
 import type { MatteSettings } from './MatteRound'
-import type { Grade, Level, OpChoice } from './types'
+import type { Grade, OpChoice } from './types'
 
 const GRADE_COLORS = ['#ff6f91', '#ff9f1c', '#2ec27e', '#3da5ff', '#9b5cff', '#ff5ccf']
 
@@ -20,7 +21,19 @@ export function MatteSetup({ onStart, onBack }: Props) {
 
   if (grade === null) return <GradeScreen onBack={onBack} onPick={setGrade} />
   if (op === null) return <OpScreen grade={grade} onBack={() => setGrade(null)} onPick={setOp} />
-  return <LevelScreen grade={grade} op={op} onBack={() => setOp(null)} onPick={(level) => onStart({ grade, op, level })} />
+  return (
+    <LevelScreen
+      texts={LEVEL_TEXTS}
+      chips={
+        <>
+          <span className="chip">🧮 Åk {grade}</span>
+          <span className="chip">{OP_INFO[op].icon}</span>
+        </>
+      }
+      onBack={() => setOp(null)}
+      onPick={(level) => onStart({ grade, op, level })}
+    />
+  )
 }
 
 function GradeScreen({ onPick, onBack }: { onPick: (g: Grade) => void; onBack: () => void }) {
@@ -64,36 +77,6 @@ function OpScreen({ grade, onPick, onBack }: { grade: Grade; onPick: (op: OpChoi
         ))}
       </div>
       {grade === 6 && <p className="hint-text">Tips: på Medel och Svår i åk 6 tränar du prioriteringsregler!</p>}
-    </div>
-  )
-}
-
-function LevelScreen({
-  grade,
-  op,
-  onPick,
-  onBack,
-}: {
-  grade: Grade
-  op: OpChoice
-  onPick: (l: Level) => void
-  onBack: () => void
-}) {
-  return (
-    <div className="screen">
-      <Header onBack={onBack}>
-        <span className="chip">🧮 Åk {grade}</span>
-        <span className="chip">{OP_INFO[op].icon}</span>
-      </Header>
-      <h2 className="question-title">Hur svårt?</h2>
-      <div className="grid grid-1">
-        {(Object.keys(LEVEL_INFO) as Level[]).map((l) => (
-          <button key={l} className="tile tile-row" style={{ background: LEVEL_INFO[l].color }} onClick={tap(() => onPick(l))}>
-            <span className="tile-big">{LEVEL_INFO[l].label}</span>
-            <span className="tile-small">{LEVEL_INFO[l].text}</span>
-          </button>
-        ))}
-      </div>
     </div>
   )
 }

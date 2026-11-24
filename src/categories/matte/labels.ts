@@ -8,9 +8,9 @@ export const OP_INFO: Record<OpChoice, { icon: string; label: string; color: str
   mix: { icon: '🎲', label: 'Blandat', color: '#ff6f91' },
 }
 
-export const LEVEL_INFO: Record<Level, { label: string; text: string; color: string }> = {
-  latt: { label: 'Lätt', text: 'Välj bland fyra svar', color: '#2ec27e' },
-  medel: { label: 'Medel', text: 'Skriv svaret själv', color: '#ffb703' },
-  svar: { label: 'Svår', text: 'Kluriga uppgifter', color: '#ff5c5c' },
+export const LEVEL_TEXTS: Record<Level, string> = {
+  latt: 'Välj bland fyra svar',
+  medel: 'Skriv svaret själv',
+  svar: 'Kluriga uppgifter',
 }
 

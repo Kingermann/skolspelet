@@ -5,6 +5,8 @@ import { describe, expect, it } from 'vitest'
 import { ROUND_LENGTH } from '../../game/constants'
 import { COUNTRIES, CONTINENTS, IGNORED, MERGED_INTO, TERRITORIES, type Continent } from './countries'
 import { buildContinentMap } from './map'
+import { pickRoundCountries } from './round'
+import { LEVELS } from '../../game/levels'
 
 const require = createRequire(import.meta.url)
 const topology = JSON.parse(readFileSync(require.resolve('world-atlas/countries-50m.json'), 'utf8'))
@@ -112,5 +114,51 @@ describe('några kontroller av kartorna', () => {
   it('Franska Guyana syns grått i Sydamerika, Grönland grått i Nordamerika', () => {
     expect(buildContinentMap(topology, 'sydamerika').shapes.find((s) => s.id === 'France')?.kind).toBe('territory')
     expect(buildContinentMap(topology, 'nordamerika').shapes.find((s) => s.id === 'Greenland')?.kind).toBe('territory')
+  })
+})
+
+describe('nivåer', () => {
+  it('varje land har nivå 1, 2 eller 3', () => {
+    for (const [name, c] of Object.entries(COUNTRIES)) expect([1, 2, 3], name).toContain(c.level)
+  })
+
+  it('kända länder ligger på Lätt', () => {
+    for (const n of ['Sweden', 'Norway', 'Germany', 'France', 'Russia', 'China', 'United States of America', 'Brazil', 'Australia', 'Egypt']) {
+      expect(COUNTRIES[n].level, n).toBe(1)
+    }
+    for (const n of ['Vatican', 'Monaco', 'Liechtenstein', 'Nauru']) expect(COUNTRIES[n].level, n).toBe(3)
+  })
+
+  it.each(ALL_CONTINENTS)('%s: varje nivå ger 10 olika länder', (continent) => {
+    const countries = buildContinentMap(topology, continent).shapes.filter((s) => s.kind === 'country')
+    for (const level of LEVELS) {
+      for (let i = 0; i < 50; i++) {
+        const round = pickRoundCountries(countries, level)
+        expect(round).toHaveLength(ROUND_LENGTH)
+        expect(new Set(round.map((c) => c.id)).size).toBe(ROUND_LENGTH)
+      }
+    }
+  })
+
+  it('Europa: varje nivå frågar bara om sin nivås länder (det finns tillräckligt många)', () => {
+    const countries = buildContinentMap(topology, 'europa').shapes.filter((s) => s.kind === 'country')
+    const tiers = { latt: 1, medel: 2, svar: 3 } as const
+    for (const level of LEVELS) {
+      for (let i = 0; i < 50; i++) {
+        for (const c of pickRoundCountries(countries, level)) expect(COUNTRIES[c.id].level, `${level}: ${c.id}`).toBe(tiers[level])
+      }
+    }
+  })
+
+  it('Sydamerika: för få länder på en nivå ⇒ alla nivåns länder är med och resten fylls på', () => {
+    const countries = buildContinentMap(topology, 'sydamerika').shapes.filter((s) => s.kind === 'country')
+    const levelOf = (ids: { id: string }[]) => ids.map((c) => COUNTRIES[c.id].level)
+    const count = (arr: number[], t: number) => arr.filter((x) => x === t).length
+    const hard = levelOf(pickRoundCountries(countries, 'svar'))
+    expect(count(hard, 3)).toBe(2) // Guyana och Surinam
+    expect(count(hard, 2)).toBe(4) // sedan nivån under
+    const medium = levelOf(pickRoundCountries(countries, 'medel'))
+    expect(count(medium, 2)).toBe(4)
+    expect(count(medium, 1)).toBe(6)
   })
 })

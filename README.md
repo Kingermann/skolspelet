@@ -4,7 +4,8 @@ Ett spel för att öva på skolämnen. Välj kategori, spela en runda, samla stj
 fotbollskort och klistermärken!
 
 - **🧮 Matte** – välj årskurs (1–6), räknesätt och nivå. Tio uppgifter per runda, varav tre textuppgifter.
-- **🌍 Geografi** – välj världsdel. Du får ett land och ska trycka där det ligger på kartan.
+- **🌍 Geografi** – välj världsdel och nivå. Du får ett land och ska trycka där det ligger på kartan.
+  Lätt = stora och kända länder, Medel = lite mindre länder, Svår = små och kluriga länder.
 
 ## Starta spelet
 
@@ -28,7 +29,7 @@ Stäng av med `Ctrl + C` i terminalen.
 | **Matte:** hur svårt det är (talområden per årskurs och nivå) | `src/categories/matte/config.ts` |
 | **Matte:** största tal (nu 1000) och antal textuppgifter | `MAX_NUMBER` / `STORIES_PER_ROUND` i samma fil |
 | **Matte:** textuppgifterna (berättelser, namn) | `src/categories/matte/stories.ts` |
-| **Geografi:** svenska landsnamn och vilken världsdel ett land hör till | `src/categories/geografi/countries.ts` |
+| **Geografi:** svenska landsnamn, världsdel och nivå (1 = Lätt, 2 = Medel, 3 = Svår) | `src/categories/geografi/countries.ts` |
 | Antal frågor per runda | `ROUND_LENGTH` i `src/game/constants.ts` |
 | Klistermärken och fotbollsspelare | `src/game/stickers.ts` |
 | Hur mycket konfetti det blir | `src/game/celebrate.ts` |
@@ -66,7 +67,8 @@ npm test
 - **Matte:** tusentals genererade uppgifter kontrolleras – facit stämmer, svaren är heltal ≥ 0,
   inget tal är större än 1000 och alla tal i uträkningen står i textuppgiften.
 - **Geografi:** varje område i kartdatan är klassat, alla länder har svenskt namn och världsdel,
-  varje världsdels karta innehåller exakt sina länder och minst 10 frågor.
+  varje världsdels karta innehåller exakt sina länder och varje nivå ger 10 olika länder
+  (har en nivå för få länder fylls rundan på från närmaste nivå).
 
 ## Idéer för nästa steg
 

@@ -4,7 +4,8 @@ import { Progress } from '../../components/Progress'
 import { sounds } from '../../game/sound'
 import { useRoundFlow, type RoundFlow } from '../../game/useRoundFlow'
 import { fmt, makeChoices, shuffle } from './generator'
-import { LEVEL_INFO, OP_INFO } from './labels'
+import { LEVEL_STYLE } from '../../game/levels'
+import { OP_INFO } from './labels'
 import { generateRound } from './round'
 import type { Grade, Level, OpChoice, Problem } from './types'
 
@@ -51,7 +52,7 @@ export function MatteRound({ settings, onFinish, onQuit }: Props) {
       >
         <span className="chip">Åk {grade}</span>
         <span className="chip">{OP_INFO[op].icon}</span>
-        <span className="chip">{LEVEL_INFO[level].label}</span>
+        <span className="chip">{LEVEL_STYLE[level].label}</span>
       </Header>
       <Progress marks={flow.marks} index={flow.index} isRetake={flow.isRetake} />
       {/* Ny nyckel per fråga ⇒ inmatning, 50/50 m.m. nollställs automatiskt. */}
