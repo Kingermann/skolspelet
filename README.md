@@ -23,10 +23,19 @@ Stäng av med `Ctrl + C` i terminalen.
 | Vill ni ändra… | Fil |
 |---|---|
 | Hur svårt det är (talområden per årskurs och nivå) | `src/game/config.ts` |
-| Vilka klistermärken som finns | `src/game/stickers.ts` |
+| Vilka klistermärken och fotbollsspelare som finns | `src/game/stickers.ts` |
+| Hur mycket konfetti det blir | `src/game/celebrate.ts` |
 | Färger och utseende | `src/index.css` (överst finns alla färger) |
 | Beröm-texterna ("Snyggt! ⭐") | `src/components/Round.tsx` |
-| Ljuden | `src/game/sound.ts` |
+| Ljuden (pling, applåder, fanfar) | `src/game/sound.ts` |
+
+### Egen bild på en fotbollsspelare
+
+Fotbollskorten visar landslagströjan med nummer. Vill ni ha en egen bild istället
+(t.ex. en teckning ni har fotat):
+
+1. Lägg bilden i mappen `public/stickers/`, t.ex. `public/stickers/ronaldo.png`
+2. Lägg till `image: 'ronaldo.png'` på spelaren i `src/game/stickers.ts`
 
 ## Kontrollera att facit stämmer
 

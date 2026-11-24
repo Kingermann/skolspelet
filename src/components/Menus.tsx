@@ -1,9 +1,10 @@
 import { opsForGrade } from '../game/config'
 import { LEVEL_INFO, OP_INFO } from '../game/labels'
 import { sounds } from '../game/sound'
-import { STICKERS } from '../game/stickers'
+import { ALL_STICKERS, EMOJI_STICKERS, PLAYERS } from '../game/stickers'
 import type { Grade, Level, OpChoice } from '../game/types'
 import { Header } from './Header'
+import { MissingPlayerCard, StickerView } from './StickerView'
 
 const tap = (fn: () => void) => () => {
   sounds.tap()
@@ -117,26 +118,37 @@ export function LevelScreen({
 // ---------- Album ----------
 
 export function AlbumScreen({ album, onBack }: { album: string[]; onBack: () => void }) {
-  const unique = new Set(album)
+  const owned = new Set(album)
+  const count = (id: string) => album.filter((a) => a === id).length
+  const badge = (id: string) => count(id) > 1 && <span className="sticker-count">×{count(id)}</span>
   return (
     <div className="screen">
       <Header onBack={onBack}>
         <span className="chip">
-          {unique.size} / {STICKERS.length}
+          {owned.size} / {ALL_STICKERS.length}
         </span>
       </Header>
       <h2 className="question-title">📒 Mitt album</h2>
       {album.length === 0 && <p className="hint-text">Spela en runda för att få ditt första klistermärke!</p>}
+
+      <h3 className="album-section">⚽ Fotbollsstjärnor</h3>
+      <div className="album album-players">
+        {PLAYERS.map((p) => (
+          <div key={p.id} className="album-slot">
+            {owned.has(p.id) ? <StickerView sticker={p} /> : <MissingPlayerCard />}
+            {badge(p.id)}
+          </div>
+        ))}
+      </div>
+
+      <h3 className="album-section">🐶 Djur, mat och rymden</h3>
       <div className="album">
-        {STICKERS.map((s) => {
-          const count = album.filter((a) => a === s).length
-          return (
-            <div key={s} className={`sticker ${count > 0 ? 'owned' : 'missing'}`}>
-              {count > 0 ? s : '?'}
-              {count > 1 && <span className="sticker-count">×{count}</span>}
-            </div>
-          )
-        })}
+        {EMOJI_STICKERS.map((s) => (
+          <div key={s.id} className={`sticker ${owned.has(s.id) ? 'owned' : 'missing'}`}>
+            {owned.has(s.id) ? s.emoji : '?'}
+            {badge(s.id)}
+          </div>
+        ))}
       </div>
     </div>
   )

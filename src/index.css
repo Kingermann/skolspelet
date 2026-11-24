@@ -353,6 +353,20 @@ button:disabled {
 
 .phase-correct .message {
   color: var(--green-dark);
+  font-size: 30px;
+  animation: praise 0.5s ease-out;
+}
+
+.streak {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff9f1c, #ff5c5c);
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  animation: praise 0.5s 0.15s ease-out both;
 }
 
 .phase-retry .message {
@@ -505,14 +519,87 @@ button:disabled {
   color: var(--primary-dark);
 }
 
-.new-sticker-emoji {
+.new-sticker-btn {
+  background: none;
+  padding: 0;
+  animation: wiggle 2s 2s ease-in-out infinite;
+}
+
+.new-sticker-emoji .emoji-sticker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 84px;
   background: white;
   width: 130px;
   height: 130px;
   border-radius: 50%;
   box-shadow: 0 6px 0 rgba(43, 34, 80, 0.15);
-  animation: wiggle 2s 2s ease-in-out infinite;
+}
+
+.new-sticker-player .player-card {
+  width: 170px;
+}
+
+.new-sticker-player .player-name {
+  font-size: 17px;
+}
+
+/* ---------- Fotbollskort ---------- */
+.player-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  padding: 8px 6px 6px;
+  border-radius: 16px;
+  border: 4px solid #ffd23f;
+  background: radial-gradient(circle at 50% 30%, #3fbf6b, #1f8a47);
+  box-shadow: 0 5px 0 rgba(43, 34, 80, 0.2);
+  overflow: hidden;
+}
+
+.player-flag {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.player-card .shirt,
+.player-image {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.2));
+}
+
+.player-name {
+  width: 100%;
+  margin-top: 4px;
+  padding: 3px 4px;
+  border-radius: 8px;
+  background: white;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.player-card-missing {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: none;
+}
+
+.player-card-missing .player-name {
+  background: rgba(255, 255, 255, 0.5);
+  color: rgba(43, 34, 80, 0.35);
 }
 
 /* ---------- Album ---------- */
@@ -521,6 +608,19 @@ button:disabled {
   grid-template-columns: repeat(5, 1fr);
   gap: 10px;
   padding-bottom: 16px;
+}
+
+.album-section {
+  margin: 4px 0 0;
+  font-size: 20px;
+}
+
+.album-players {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.album-slot {
+  position: relative;
 }
 
 .sticker {
@@ -556,32 +656,7 @@ button:disabled {
   font-weight: 700;
 }
 
-/* ---------- Konfetti ---------- */
-.confetti {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 10;
-}
-
-.confetti span {
-  position: absolute;
-  top: -20px;
-  border-radius: 2px;
-  animation-name: fall;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-}
-
 /* ---------- Animationer ---------- */
-@keyframes fall {
-  to {
-    transform: translateY(110vh) rotate(calc(var(--spin) * 720deg));
-    opacity: 0.8;
-  }
-}
-
 @keyframes bounce {
   0%,
   100% {
@@ -605,7 +680,21 @@ button:disabled {
 
 @keyframes pop {
   50% {
-    transform: scale(1.06);
+    transform: scale(1.08) rotate(-1deg);
+  }
+}
+
+@keyframes praise {
+  from {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1);
   }
 }
 

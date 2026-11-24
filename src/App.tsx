@@ -4,7 +4,7 @@ import { Result } from './components/Result'
 import { Round } from './components/Round'
 import { SoundContext } from './components/SoundContext'
 import { setSoundEnabled, sounds } from './game/sound'
-import { pickSticker } from './game/stickers'
+import { pickSticker, type Sticker } from './game/stickers'
 import type { Grade, Level, OpChoice } from './game/types'
 
 type Screen = 'start' | 'grade' | 'op' | 'level' | 'round' | 'result' | 'album'
@@ -19,7 +19,7 @@ export default function App() {
   const [op, setOp] = useState<OpChoice>('+')
   const [level, setLevel] = useState<Level>('latt')
   const [album, setAlbum] = useState<string[]>([])
-  const [result, setResult] = useState({ firstTryCorrect: 0, sticker: '' })
+  const [result, setResult] = useState<{ firstTryCorrect: number; sticker: Sticker } | null>(null)
   const [roundId, setRoundId] = useState(0)
   const [albumBack, setAlbumBack] = useState<Screen>('start')
   const [soundOn, setSoundOn] = useState(true)
@@ -43,7 +43,7 @@ export default function App() {
 
   function finishRound(firstTryCorrect: number) {
     const sticker = pickSticker(album)
-    setAlbum((a) => [...a, sticker])
+    setAlbum((a) => [...a, sticker.id])
     setResult({ firstTryCorrect, sticker })
     setScreen('result')
   }
@@ -92,7 +92,7 @@ export default function App() {
         {screen === 'round' && (
           <Round key={roundId} grade={grade} level={level} op={op} onFinish={finishRound} onQuit={() => setScreen('start')} />
         )}
-        {screen === 'result' && (
+        {screen === 'result' && result && (
           <Result
             {...result}
             onAgain={startRound}

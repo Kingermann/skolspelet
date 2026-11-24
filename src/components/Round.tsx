@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ROUND_LENGTH } from '../game/config'
+import { celebrateCorrect } from '../game/celebrate'
 import { fmt, generateRound, makeChoices, shuffle } from '../game/generator'
 import { LEVEL_INFO, OP_INFO } from '../game/labels'
 import { sounds } from '../game/sound'
@@ -19,6 +20,8 @@ type Mark = 'pending' | 'first' | 'later' | 'missed'
 const PRAISE = ['Rätt! 🎉', 'Snyggt! ⭐', 'Grymt! 🚀', 'Wow! 🌟', 'Perfekt! ✨', 'Klockrent! 💯', 'Superbra! 🙌']
 const RETRY = ['Nästan! Försök igen 💪', 'Inte riktigt – en gång till! 🤔', 'Ett försök till! 🍀']
 const MAX_DIGITS = 7
+/** Hur länge man får njuta av firandet innan nästa uppgift kommer (millisekunder). */
+const CELEBRATION_MS = 1600
 
 interface Props {
   grade: Grade
@@ -45,6 +48,8 @@ export function Round({ grade, level, op, onFinish, onQuit }: Props) {
   const [fiftyUsed, setFiftyUsed] = useState(false)
   const [marks, setMarks] = useState<Mark[]>(() => Array(ROUND_LENGTH).fill('pending'))
   const [message, setMessage] = useState('')
+  /** Antal rätt på första försöket i rad. */
+  const [streak, setStreak] = useState(0)
 
   const item = items[index]
   const { problem } = item
@@ -58,13 +63,19 @@ export function Round({ grade, level, op, onFinish, onQuit }: Props) {
   function submit(value: number) {
     if (done) return
     if (value === problem.answer) {
-      sounds.correct()
+      const newStreak = attempts === 0 ? streak + 1 : 0
+      // Var tredje rätt i rad blir det extra stort firande!
+      const big = newStreak >= 3 && newStreak % 3 === 0
+      sounds.correct(big)
+      celebrateCorrect(big)
+      setStreak(newStreak)
       setPhase('correct')
       setMessage(shuffle(PRAISE)[0])
       mark(attempts === 0 ? 'first' : 'later')
       return
     }
     sounds.wrong()
+    setStreak(0)
     setInput('')
     if (attempts === 0) {
       setAttempts(1)
@@ -96,7 +107,7 @@ export function Round({ grade, level, op, onFinish, onQuit }: Props) {
   // Rätt svar ⇒ gå vidare automatiskt efter en liten stund.
   useEffect(() => {
     if (phase !== 'correct') return
-    const t = setTimeout(advance, 1100)
+    const t = setTimeout(advance, CELEBRATION_MS)
     return () => clearTimeout(t)
   })
 
@@ -188,6 +199,7 @@ export function Round({ grade, level, op, onFinish, onQuit }: Props) {
           {after}
         </div>
         <div className="message">{message}</div>
+        {phase === 'correct' && streak >= 2 && <div className="streak">🔥 {streak} rätt i rad!</div>}
         {phase === 'reveal' && <div className="solution">{problem.solution}</div>}
       </div>
 

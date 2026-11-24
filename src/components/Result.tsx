@@ -1,15 +1,17 @@
 import { useEffect } from 'react'
 import { ROUND_LENGTH } from '../game/config'
 import { starsFor } from '../game/labels'
+import { celebrateRound } from '../game/celebrate'
 import { sounds } from '../game/sound'
-import { Confetti } from './Confetti'
+import type { Sticker } from '../game/stickers'
 import { Header } from './Header'
+import { StickerView } from './StickerView'
 
 const TITLES = { 1: 'Bra kämpat! 💪', 2: 'Bra jobbat! 😊', 3: 'Fantastiskt! 🤩' }
 
 interface Props {
   firstTryCorrect: number
-  sticker: string
+  sticker: Sticker
   onAgain: () => void
   onHome: () => void
   onAlbum: () => void
@@ -20,13 +22,16 @@ export function Result({ firstTryCorrect, sticker, onAgain, onHome, onAlbum }: P
 
   useEffect(() => {
     sounds.fanfare()
+    const stopFireworks = celebrateRound(stars)
     const t = setTimeout(sounds.sticker, 1600)
-    return () => clearTimeout(t)
-  }, [])
+    return () => {
+      clearTimeout(t)
+      stopFireworks()
+    }
+  }, [stars])
 
   return (
     <div className="screen">
-      <Confetti amount={stars === 3 ? 120 : 60} />
       <Header onBack={onHome} backIcon="🏠" backLabel="Till start" />
       <div className="result">
         <h2 className="result-title">{TITLES[stars]}</h2>
@@ -41,9 +46,11 @@ export function Result({ firstTryCorrect, sticker, onAgain, onHome, onAlbum }: P
           Du fick <strong>{firstTryCorrect}</strong> av {ROUND_LENGTH} rätt på första försöket!
         </p>
         <div className="new-sticker">
-          <span className="new-sticker-label">Nytt klistermärke!</span>
-          <button className="new-sticker-emoji" onClick={onAlbum} aria-label="Visa albumet">
-            {sticker}
+          <span className="new-sticker-label">
+            {sticker.kind === 'player' ? 'Nytt fotbollskort! ⚽' : 'Nytt klistermärke!'}
+          </span>
+          <button className={`new-sticker-btn new-sticker-${sticker.kind}`} onClick={onAlbum} aria-label="Visa albumet">
+            <StickerView sticker={sticker} />
           </button>
         </div>
         <button className="big-btn primary" onClick={onAgain}>
