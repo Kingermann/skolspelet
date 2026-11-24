@@ -128,7 +128,7 @@ export function opsForGrade(grade: Grade): Op[] {
   return Object.keys(CONFIG[grade].latt) as Op[]
 }
 
-export const ROUND_LENGTH = 10
+export { ROUND_LENGTH } from '../../game/constants'
 
 /** Hur många av rundans uppgifter som är textuppgifter ("Per har 2 äpplen…"). */
 export const STORIES_PER_ROUND = 3

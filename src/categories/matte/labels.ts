@@ -14,9 +14,3 @@ export const LEVEL_INFO: Record<Level, { label: string; text: string; color: str
   svar: { label: 'Svår', text: 'Kluriga uppgifter', color: '#ff5c5c' },
 }
 
-/** Stjärnor räknas på rätt vid första försöket. */
-export function starsFor(firstTryCorrect: number): 1 | 2 | 3 {
-  if (firstTryCorrect >= 9) return 3
-  if (firstTryCorrect >= 6) return 2
-  return 1
-}

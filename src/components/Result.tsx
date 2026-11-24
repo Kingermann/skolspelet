@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
-import { ROUND_LENGTH } from '../game/config'
-import { starsFor } from '../game/labels'
+import { ROUND_LENGTH, starsFor } from '../game/constants'
 import { celebrateRound } from '../game/celebrate'
 import { sounds } from '../game/sound'
 import type { Sticker } from '../game/stickers'

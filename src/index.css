@@ -758,3 +758,176 @@ button:disabled {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ---------- Kategorier på startskärmen ---------- */
+.categories {
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.category-tile {
+  padding: 26px 10px;
+}
+
+/* ---------- Geografi: kartspelet ---------- */
+.map-round {
+  gap: 12px;
+}
+
+.map-card {
+  padding: 14px 16px 12px;
+}
+
+.map-question {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.map-question strong {
+  font-size: 30px;
+  color: var(--primary-dark);
+}
+
+.map-card .message {
+  min-height: 0;
+  margin-top: 6px;
+  font-size: 19px;
+}
+
+.map-card.phase-correct .message {
+  font-size: 24px;
+}
+
+.map-card .streak {
+  font-size: 17px;
+}
+
+.map-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 280px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #cfe8ff;
+}
+
+.map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  display: block;
+}
+
+.country {
+  fill: #ffffff;
+  stroke: #5b5480;
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  transition: fill 0.25s;
+}
+
+@media (hover: hover) {
+  .country:hover {
+    fill: #ece6ff;
+  }
+}
+
+.country.found,
+.country.found:hover {
+  fill: var(--green);
+}
+
+.country.wrong,
+.country.wrong:hover {
+  fill: var(--orange);
+  animation: blink 0.45s 3;
+}
+
+.country.reveal,
+.country.reveal:hover {
+  fill: var(--primary);
+  animation: blink 0.7s infinite;
+}
+
+.territory {
+  fill: #dcd8ea;
+  stroke: #b9b3d0;
+  stroke-width: 0.5;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.tiny-ring {
+  fill: rgba(255, 255, 255, 0.35);
+  stroke: #5b5480;
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+}
+
+.tiny-ring.found {
+  fill: var(--green);
+  stroke: var(--green-dark);
+}
+
+.tiny-ring.wrong {
+  fill: var(--orange);
+  stroke: #d9780a;
+  animation: blink 0.45s 3;
+}
+
+.tiny-ring.reveal {
+  fill: var(--primary);
+  stroke: var(--primary-dark);
+  animation: blink 0.7s infinite;
+}
+
+.reveal-ring {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    stroke-width: 6;
+    opacity: 0.5;
+  }
+}
+
+.map-reset {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: white;
+  font-size: 22px;
+  box-shadow: 0 3px 0 rgba(43, 34, 80, 0.2);
+}
+
+.map-hint {
+  margin: 0;
+  text-align: center;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.loading {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 22px;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}

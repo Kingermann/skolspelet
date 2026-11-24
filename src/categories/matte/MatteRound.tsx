@@ -1,116 +1,82 @@
 import { useEffect, useRef, useState } from 'react'
-import { ROUND_LENGTH } from '../game/config'
-import { celebrateCorrect } from '../game/celebrate'
-import { fmt, makeChoices, shuffle } from '../game/generator'
-import { generateRound } from '../game/round'
-import { LEVEL_INFO, OP_INFO } from '../game/labels'
-import { sounds } from '../game/sound'
-import type { Grade, Level, OpChoice, Problem } from '../game/types'
-import { Header } from './Header'
+import { Header } from '../../components/Header'
+import { Progress } from '../../components/Progress'
+import { sounds } from '../../game/sound'
+import { useRoundFlow, type RoundFlow } from '../../game/useRoundFlow'
+import { fmt, makeChoices, shuffle } from './generator'
+import { LEVEL_INFO, OP_INFO } from './labels'
+import { generateRound } from './round'
+import type { Grade, Level, OpChoice, Problem } from './types'
+
+export interface MatteSettings {
+  grade: Grade
+  op: OpChoice
+  level: Level
+}
 
 interface Item {
   problem: Problem
+  /** Svarsalternativ (bara på Lätt). */
   choices: number[]
-  /** Ett "omtag" av en uppgift man missat – ger ingen stjärna. */
-  retake: boolean
 }
 
-type Phase = 'answering' | 'retry' | 'correct' | 'reveal'
-type Mark = 'pending' | 'first' | 'later' | 'missed'
-
-const PRAISE = ['Rätt! 🎉', 'Snyggt! ⭐', 'Grymt! 🚀', 'Wow! 🌟', 'Perfekt! ✨', 'Klockrent! 💯', 'Superbra! 🙌']
 const RETRY = ['Nästan! Försök igen 💪', 'Inte riktigt – en gång till! 🤔', 'Ett försök till! 🍀']
 const MAX_DIGITS = 7
-/** Hur länge man får njuta av firandet innan nästa uppgift kommer (millisekunder). */
-const CELEBRATION_MS = 1600
 
 interface Props {
-  grade: Grade
-  level: Level
-  op: OpChoice
+  settings: MatteSettings
   onFinish: (firstTryCorrect: number) => void
   onQuit: () => void
 }
 
-export function Round({ grade, level, op, onFinish, onQuit }: Props) {
+export function MatteRound({ settings, onFinish, onQuit }: Props) {
+  const { grade, level, op } = settings
   const isEasy = level === 'latt'
-  const toItem = (problem: Problem, retake: boolean): Item => ({
-    problem,
-    choices: isEasy ? makeChoices(problem) : [],
-    retake,
+  const toItem = (problem: Problem): Item => ({ problem, choices: isEasy ? makeChoices(problem) : [] })
+
+  const flow = useRoundFlow<Item>({
+    makeItems: () => generateRound(grade, level, op).map(toItem),
+    onFinish,
+    remake: (item) => toItem(item.problem),
   })
 
-  const [items, setItems] = useState<Item[]>(() => generateRound(grade, level, op).map((p) => toItem(p, false)))
-  const [index, setIndex] = useState(0)
-  const [attempts, setAttempts] = useState(0)
-  const [phase, setPhase] = useState<Phase>('answering')
+  return (
+    <div className="screen round">
+      <Header
+        onBack={() => {
+          if (window.confirm('Vill du avsluta rundan?')) onQuit()
+        }}
+        backIcon="✕"
+        backLabel="Avsluta rundan"
+      >
+        <span className="chip">Åk {grade}</span>
+        <span className="chip">{OP_INFO[op].icon}</span>
+        <span className="chip">{LEVEL_INFO[level].label}</span>
+      </Header>
+      <Progress marks={flow.marks} index={flow.index} isRetake={flow.isRetake} />
+      {/* Ny nyckel per fråga ⇒ inmatning, 50/50 m.m. nollställs automatiskt. */}
+      <MathQuestion key={flow.index} flow={flow} isEasy={isEasy} />
+    </div>
+  )
+}
+
+function MathQuestion({ flow, isEasy }: { flow: RoundFlow<Item>; isEasy: boolean }) {
+  const { item, phase, done, message, streak, attempts } = flow
+  const { problem } = item
   const [input, setInput] = useState('')
   const [removed, setRemoved] = useState<number[]>([])
   const [fiftyUsed, setFiftyUsed] = useState(false)
-  const [marks, setMarks] = useState<Mark[]>(() => Array(ROUND_LENGTH).fill('pending'))
-  const [message, setMessage] = useState('')
-  /** Antal rätt på första försöket i rad. */
-  const [streak, setStreak] = useState(0)
-
-  const item = items[index]
-  const { problem } = item
-  const done = phase === 'correct' || phase === 'reveal'
-
-  const mark = (m: Mark) => {
-    if (item.retake) return
-    setMarks((prev) => prev.map((old, i) => (i === index ? m : old)))
-  }
 
   function submit(value: number) {
     if (done) return
     if (value === problem.answer) {
-      const newStreak = attempts === 0 ? streak + 1 : 0
-      // Var tredje rätt i rad blir det extra stort firande!
-      const big = newStreak >= 3 && newStreak % 3 === 0
-      sounds.correct(big)
-      celebrateCorrect(big)
-      setStreak(newStreak)
-      setPhase('correct')
-      setMessage(shuffle(PRAISE)[0])
-      mark(attempts === 0 ? 'first' : 'later')
+      flow.correct()
       return
     }
-    sounds.wrong()
-    setStreak(0)
     setInput('')
-    if (attempts === 0) {
-      setAttempts(1)
-      setPhase('retry')
-      setMessage(shuffle(RETRY)[0])
-      setRemoved((r) => [...r, value])
-    } else {
-      setPhase('reveal')
-      setMessage('Så här blir det:')
-      mark('missed')
-      if (!item.retake) setItems((prev) => [...prev, toItem(problem, true)])
-    }
+    setRemoved((r) => [...r, value])
+    flow.wrong(shuffle(RETRY)[0], 'Så här blir det:')
   }
-
-  function advance() {
-    if (index + 1 < items.length) {
-      setIndex(index + 1)
-      setAttempts(0)
-      setPhase('answering')
-      setInput('')
-      setRemoved([])
-      setFiftyUsed(false)
-      setMessage('')
-    } else {
-      onFinish(marks.filter((m) => m === 'first').length)
-    }
-  }
-
-  // Rätt svar ⇒ gå vidare automatiskt efter en liten stund.
-  useEffect(() => {
-    if (phase !== 'correct') return
-    const t = setTimeout(advance, CELEBRATION_MS)
-    return () => clearTimeout(t)
-  })
 
   const wrongLeft = item.choices.filter((c) => c !== problem.answer && !removed.includes(c))
 
@@ -124,7 +90,7 @@ export function Round({ grade, level, op, onFinish, onQuit }: Props) {
   function typeDigit(d: string) {
     if (done) return
     sounds.tap()
-    if (phase === 'retry') setPhase('answering')
+    if (phase === 'retry') flow.setPhase('answering')
     setInput((cur) => (cur === '0' ? d : cur.length >= MAX_DIGITS ? cur : cur + d))
   }
 
@@ -143,7 +109,7 @@ export function Round({ grade, level, op, onFinish, onQuit }: Props) {
   const handleKey = (e: KeyboardEvent) => {
     if (phase === 'reveal' && (e.key === 'Enter' || e.key === ' ')) {
       e.preventDefault()
-      advance()
+      flow.advance()
       return
     }
     if (isEasy) {
@@ -168,43 +134,24 @@ export function Round({ grade, level, op, onFinish, onQuit }: Props) {
   }, [])
 
   const [before, after] = problem.question.split('?')
-  const slot = done ? problem.answer : isEasy ? '?' : input || '?'
+  const slot = done ? fmt(problem.answer) : isEasy ? '?' : input || '?'
   const long = problem.question.length > 14
+  const slotEl = <span className={`slot ${input && !done ? 'slot-filled' : ''}`}>{slot}</span>
 
   return (
-    <div className="screen round">
-      <Header
-        onBack={() => {
-          if (window.confirm('Vill du avsluta rundan?')) onQuit()
-        }}
-        backIcon="✕"
-        backLabel="Avsluta rundan"
-      >
-        <span className="chip">Åk {grade}</span>
-        <span className="chip">{OP_INFO[op].icon}</span>
-        <span className="chip">{LEVEL_INFO[level].label}</span>
-      </Header>
-
-      <div className="progress">
-        {item.retake ? (
-          <span className="retake-label">🔁 Omtag – ingen stjärna, men bra träning!</span>
-        ) : (
-          marks.map((m, i) => <span key={i} className={`dot dot-${m} ${i === index ? 'dot-current' : ''}`} />)
-        )}
-      </div>
-
-      <div className={`card phase-${phase}`} key={`${index}-${attempts}`}>
+    <>
+      <div className={`card phase-${phase}`} key={attempts}>
         {problem.story ? (
           <>
             <p className="story">{problem.story}</p>
             <div className="story-answer">
-              <span className={`slot ${input && !done ? 'slot-filled' : ''}`}>{slot}</span> {problem.answerLabel}
+              {slotEl} {problem.answerLabel}
             </div>
           </>
         ) : (
           <div className={`problem ${long ? 'problem-long' : ''}`}>
             {before}
-            <span className={`slot ${input && !done ? 'slot-filled' : ''}`}>{slot}</span>
+            {slotEl}
             {after}
           </div>
         )}
@@ -215,7 +162,7 @@ export function Round({ grade, level, op, onFinish, onQuit }: Props) {
 
       <div className="answer-area">
         {phase === 'reveal' ? (
-          <button className="big-btn primary" onClick={advance}>
+          <button className="big-btn primary" onClick={flow.advance}>
             Nästa ➜
           </button>
         ) : isEasy ? (
@@ -259,6 +206,6 @@ export function Round({ grade, level, op, onFinish, onQuit }: Props) {
           </div>
         )}
       </div>
-    </div>
+    </>
   )
 }
