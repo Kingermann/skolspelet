@@ -1,4 +1,4 @@
-export type Grade = 1 | 2 | 3 | 4 | 5 | 6
+export type { Grade } from '../../game/grades'
 export type { Level } from '../../game/levels'
 export type Op = '+' | '-' | '×' | '÷'
 export type OpChoice = Op | 'mix'

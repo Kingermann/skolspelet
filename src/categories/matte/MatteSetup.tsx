@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { GradeScreen } from '../../components/GradeScreen'
 import { Header } from '../../components/Header'
 import { tap } from '../../components/tap'
 import { opsForGrade } from './config'
@@ -6,8 +7,6 @@ import { LevelScreen } from '../../components/LevelScreen'
 import { LEVEL_TEXTS, OP_INFO } from './labels'
 import type { MatteSettings } from './MatteRound'
 import type { Grade, OpChoice } from './types'
-
-const GRADE_COLORS = ['#ff6f91', '#ff9f1c', '#2ec27e', '#3da5ff', '#9b5cff', '#ff5ccf']
 
 interface Props {
   onStart: (settings: MatteSettings) => void
@@ -19,7 +18,7 @@ export function MatteSetup({ onStart, onBack }: Props) {
   const [grade, setGrade] = useState<Grade | null>(null)
   const [op, setOp] = useState<OpChoice | null>(null)
 
-  if (grade === null) return <GradeScreen onBack={onBack} onPick={setGrade} />
+  if (grade === null) return <GradeScreen chips={<span className="chip">🧮 Matte</span>} onBack={onBack} onPick={setGrade} />
   if (op === null) return <OpScreen grade={grade} onBack={() => setGrade(null)} onPick={setOp} />
   return (
     <LevelScreen
@@ -36,24 +35,6 @@ export function MatteSetup({ onStart, onBack }: Props) {
   )
 }
 
-function GradeScreen({ onPick, onBack }: { onPick: (g: Grade) => void; onBack: () => void }) {
-  return (
-    <div className="screen">
-      <Header onBack={onBack}>
-        <span className="chip">🧮 Matte</span>
-      </Header>
-      <h2 className="question-title">Vilken årskurs?</h2>
-      <div className="grid grid-2">
-        {([1, 2, 3, 4, 5, 6] as Grade[]).map((g, i) => (
-          <button key={g} className="tile" style={{ background: GRADE_COLORS[i] }} onClick={tap(() => onPick(g))}>
-            <span className="tile-big">{g}</span>
-            <span className="tile-small">årskurs</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 function OpScreen({ grade, onPick, onBack }: { grade: Grade; onPick: (op: OpChoice) => void; onBack: () => void }) {
   const ops: OpChoice[] = [...opsForGrade(grade), 'mix']
