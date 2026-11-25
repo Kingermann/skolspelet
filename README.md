@@ -7,6 +7,10 @@ fotbollskort och klistermärken!
 - **📝 Svenska** – välj årskurs och nivå. "Vilket av följande ord är rättstavat?" med fyra alternativ.
   Årskursen styr orden, nivån hur luriga felstavningarna är (Lätt = tydliga fel, Medel = vanliga
   stavningsfel, Svår = svåra ord och luriga fel). Efter två fel visas ett stavningstips.
+- **🇬🇧 Engelska** – glosor. Välj årskurs, riktning (engelska→svenska, svenska→engelska eller blandat)
+  och nivå. Fyra alternativ; Lätt = alternativ från andra områden, Medel = från samma område,
+  Svår = svåra glosor och förväxlingsord (quiet/quite). 🔊 läser upp det engelska ordet
+  (brittiskt uttal, webbläsarens inbyggda talsyntes).
 - **🌍 Geografi** – välj spelläge, världsdel och nivå:
   - **🗺️ Var ligger landet?** – du får ett land och ska trycka där det ligger på kartan.
   - **🚩 Flaggor** – du ser en flagga och väljer rätt land bland fyra.
@@ -41,6 +45,7 @@ Stäng av med `Ctrl + C` i terminalen.
 | **Matte:** textuppgifterna (berättelser, namn) | `src/categories/matte/stories.ts` |
 | **Svenska:** stavningsord per årskurs (lägg gärna till veckoord!) | `src/categories/svenska/words.ts` |
 | **Svenska:** regler för felstavningar och stavningstipsen | `src/categories/svenska/misspell.ts` |
+| **Engelska:** glosor per årskurs och område, och förväxlingsord | `src/categories/engelska/words.ts` |
 | **Geografi:** svenska landsnamn, världsdel och nivå (1 = Lätt, 2 = Medel, 3 = Svår) | `src/categories/geografi/countries.ts` |
 | **Geografi:** grupper av flaggor som liknar varandra | `src/categories/geografi/flags.ts` |
 | Antal frågor per runda | ⚙️ på startskärmen (3, 5, 10, 15 eller 20). Valen och standardvärdet finns i `src/game/constants.ts` |
@@ -64,11 +69,11 @@ officiella, aktuella designen (t.ex. Syriens nya flagga). Alla visas i formatet 
 kan skilja lite från verkligheten (Schweiz blir t.ex. rektangulär). Afghanistan visas med den flagga
 som FN och Sverige använder.
 
-## Svensk ordlista
+## Ordlistor i testerna
 
-Stavningstesterna använder ordlistan [dictionary-sv](https://github.com/wooorm/dictionaries)
-(LGPL-3.0, underhållen av Göran Andersson) via `nspell`. Den används bara i testerna och följer
-inte med i appen.
+Testerna använder ordlistorna [dictionary-sv](https://github.com/wooorm/dictionaries) (LGPL-3.0,
+underhållen av Göran Andersson) och dictionary-en-gb (MIT/BSD) via `nspell`. De används bara i
+testerna och följer inte med i appen.
 
 ## Lägga till en ny kategori
 
@@ -106,6 +111,9 @@ npm test
 - **Svenska:** varje stavningsord finns i den svenska ordlistan (dictionary-sv), och inget felstavat
   alternativ är ett riktigt ord (t.ex. "koma" eller "hopa"). Skapar reglerna ett riktigt ord säger
   testet exakt vilket som ska läggas till i `realWords.ts`, där sådana ord spärras.
+- **Engelska:** alla engelska ord är rättstavade med brittisk stavning (dictionary-en-gb) och alla svenska
+  ord finns i den svenska ordlistan. Varje engelskt och svenskt ord finns bara en gång i hela listan,
+  så att en fråga aldrig kan få två rätta svar.
 - **Geografi:** varje område i kartdatan är klassat, alla länder har svenskt namn och världsdel,
   varje världsdels karta innehåller exakt sina länder och varje nivå ger 10 olika länder
   (har en nivå för få länder fylls rundan på från närmaste nivå). Varje land har en landskod med en

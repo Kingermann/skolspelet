@@ -1,26 +1,11 @@
-/// <reference types="node" />
-import dictionary from 'dictionary-sv'
-import nspell from 'nspell'
 import { describe, expect, it } from 'vitest'
 import { GRADES } from '../../game/grades'
 import { LEVELS } from '../../game/levels'
+import { isSwedishWord as isWord } from '../../testing/dictionaries'
 import { commonMisspellings, obviousMisspellings, TIPS } from './misspell'
 import { REAL_WORDS } from './realWords'
 import { allowedCommon, allowedObvious, makeQuestion, pickWords } from './spelling'
 import { WORDS } from './words'
-
-/**
- * Svensk ordlista (dictionary-sv) utan sammansättningsregler. Med dem godkänner
- * stavningskontrollen nästan vad som helst ("kat", "järta" …) eftersom felstavningar
- * kan tolkas som hopsatta ordbitar. Vanliga sammansättningar finns ändå som egna ord.
- */
-const aff = new TextDecoder()
-  .decode(dictionary.aff)
-  .split('\n')
-  .filter((line) => !/^(COMPOUND|ONLYINCOMPOUND|CHECKCOMPOUND)/.test(line))
-  .join('\n')
-const spell = nspell({ aff: Buffer.from(aff), dic: Buffer.from(dictionary.dic) })
-const isWord = (w: string) => spell.correct(w)
 
 const allWords = GRADES.flatMap((g) => [...WORDS[g].ord, ...WORDS[g].svåra])
 
