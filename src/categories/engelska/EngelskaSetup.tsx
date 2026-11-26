@@ -57,7 +57,8 @@ export function EngelskaSetup({ onStart, onBack }: { onStart: (settings: Engelsk
         </>
       }
       onBack={() => setDirection(null)}
-      onPick={(level) => onStart({ grade, direction, level })}
+      choices={{ grade, direction }}
+      onStart={onStart}
     />
   )
 }

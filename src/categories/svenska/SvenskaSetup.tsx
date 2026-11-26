@@ -21,7 +21,8 @@ export function SvenskaSetup({ onStart, onBack }: { onStart: (settings: SvenskaS
       texts={LEVEL_TEXTS}
       chips={<span className="chip">📝 Åk {grade}</span>}
       onBack={() => setGrade(null)}
-      onPick={(level) => onStart({ grade, level })}
+      choices={{ grade }}
+      onStart={onStart}
     />
   )
 }

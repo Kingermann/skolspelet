@@ -1125,3 +1125,171 @@ button:disabled {
   font-size: 24px;
   overflow-wrap: anywhere;
 }
+
+/* ---------- Bästa resultat på nivåknapparna ---------- */
+.level-tile {
+  position: relative;
+}
+
+.level-best {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 22px;
+  line-height: 1;
+  text-shadow: none;
+}
+
+.level-best .star-on {
+  text-shadow: 0 2px 0 #d9a800;
+}
+
+.level-best .star-off {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ---------- Profiler ---------- */
+.profile-chip {
+  border: none;
+  font-family: inherit;
+  color: inherit;
+  font-size: 17px;
+  padding: 8px 14px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: 0 3px 0 rgba(43, 34, 80, 0.15);
+}
+
+.profile-chip:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.profile-slot {
+  position: relative;
+  display: flex;
+}
+
+.profile-tile {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-tile .tile-big {
+  font-size: 56px;
+}
+
+.profile-tile .tile-small {
+  font-size: 20px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-edit-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  font-size: 18px;
+  box-shadow: 0 3px 0 rgba(43, 34, 80, 0.18);
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-preview {
+  align-self: center;
+  font-size: 88px;
+  line-height: 1;
+}
+
+.field-label {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.text-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 3px solid white;
+  border-radius: var(--radius);
+  background: white;
+  color: var(--ink);
+  font-family: inherit;
+  /* Minst 16px, annars zoomar iPhone in när man trycker i rutan. */
+  font-size: 26px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 5px 0 rgba(43, 34, 80, 0.18);
+  /* body stänger av markering – rutan måste få ha det, annars går det inte att skriva på iPhone. */
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-problem {
+  margin: 0;
+  text-align: center;
+  font-weight: 600;
+  color: #c62828;
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.avatar-option {
+  aspect-ratio: 1;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 30px;
+  line-height: 1;
+  border: 3px solid transparent;
+}
+
+.avatar-option.selected {
+  background: white;
+  border-color: var(--primary);
+  transform: scale(1.08);
+}
+
+.big-btn:disabled {
+  opacity: 0.45;
+  transform: none;
+}
+
+.big-btn.danger {
+  background: var(--red);
+  color: white;
+  box-shadow: 0 6px 0 #c62828;
+}
+
+.text-btn {
+  align-self: center;
+  padding: 10px 16px;
+  background: none;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.text-btn.danger {
+  color: #c62828;
+}

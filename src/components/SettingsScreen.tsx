@@ -3,7 +3,7 @@ import { useGameSettings } from '../game/gameSettings'
 import { Header } from './Header'
 import { tap } from './tap'
 
-/** ⚙️ Inställningar för hela appen. */
+/** ⚙️ Inställningar för den som spelar (sparas i profilen). */
 export function SettingsScreen({ onBack }: { onBack: () => void }) {
   const { roundLength, setRoundLength } = useGameSettings()
   return (
@@ -24,7 +24,7 @@ export function SettingsScreen({ onBack }: { onBack: () => void }) {
           </button>
         ))}
       </div>
-      <p className="hint-text">Gäller alla kategorier tills du stänger spelet.</p>
+      <p className="hint-text">Gäller alla kategorier och sparas i din profil.</p>
       <button className="big-btn primary" onClick={tap(onBack)}>
         Klar ✓
       </button>

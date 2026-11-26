@@ -1,4 +1,5 @@
 import type { Category } from '../categories/types'
+import type { Profile } from '../game/profiles'
 import { ALL_STICKERS, EMOJI_STICKERS, PLAYERS } from '../game/stickers'
 import { Header } from './Header'
 import { MissingPlayerCard, StickerView } from './StickerView'
@@ -8,22 +9,28 @@ import { tap } from './tap'
 
 interface StartProps {
   categories: Category<unknown>[]
-  albumCount: number
+  profile: Profile
   onPick: (category: Category<unknown>) => void
   onAlbum: () => void
   onSettings: () => void
+  /** Byt profil ("Vem spelar?"). */
+  onProfiles: () => void
 }
 
-export function StartScreen({ categories, albumCount, onPick, onAlbum, onSettings }: StartProps) {
+export function StartScreen({ categories, profile, onPick, onAlbum, onSettings, onProfiles }: StartProps) {
   return (
     <div className="screen">
-      <Header onBack={onSettings} backIcon="⚙️" backLabel="Inställningar" />
+      <Header onBack={onSettings} backIcon="⚙️" backLabel="Inställningar">
+        <button className="chip profile-chip" aria-label={`${profile.name} spelar. Byt profil`} onClick={tap(onProfiles)}>
+          {profile.avatar} {profile.name}
+        </button>
+      </Header>
       <div className="start">
         <div className="logo" aria-hidden>
           <span>🎒</span>
         </div>
         <h1 className="title">Skolspelet</h1>
-        <p className="subtitle">Vad vill du öva på idag?</p>
+        <p className="subtitle">Hej {profile.name}! Vad vill du öva på idag?</p>
         <div className="grid grid-2 categories">
           {categories.map((c) => (
             <button key={c.id} className="tile category-tile" style={{ background: c.color }} onClick={tap(() => onPick(c))}>
@@ -33,7 +40,7 @@ export function StartScreen({ categories, albumCount, onPick, onAlbum, onSetting
           ))}
         </div>
         <button className="big-btn secondary" onClick={tap(onAlbum)}>
-          📒 Mitt album <span className="badge">{albumCount}</span>
+          📒 Mitt album <span className="badge">{new Set(profile.album).size}</span>
         </button>
       </div>
     </div>

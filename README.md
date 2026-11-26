@@ -34,7 +34,7 @@ npm run dev
 
 Stäng av med `Ctrl + C` i terminalen.
 
-> Inget sparas – laddar man om sidan börjar allt om (även inställningen för antal frågor). Ljudet hörs inte om iPhonen står på ljudlöst.
+> Ljudet hörs inte om iPhonen står på ljudlöst.
 
 ## Spela på iPhone och iPad
 
@@ -44,6 +44,20 @@ Då får spelet en egen ikon (🎒) och öppnas i helskärm som en app.
 - **Öppna alltid spelet från ikonen.** På iPhone och iPad har appen på hemskärmen sin egen
   lagring, skild från Safari – spelar man ibland i Safari syns inte det i appen och tvärtom.
 - Byts ikonen ut måste man ta bort genvägen och lägga till den igen för att se den nya.
+  **Obs!** Tar man bort genvägen försvinner också allt sparat (profiler och album).
+
+## Profiler och sparande
+
+Första gången man öppnar spelet skapar man en profil: ett namn och en bild. Flera barn kan ha
+var sin profil på samma iPad – finns det fler än en frågar spelet **Vem spelar?** när det startar.
+Tryck på namnet uppe på startskärmen för att byta profil. ✏️ på "Vem spelar?" ändrar namn och bild
+eller tar bort profilen (man måste skriva namnet för att ta bort, så att det inte händer av misstag).
+
+Varje profil sparar sitt **album**, sina **inställningar** (antal frågor, ljud på/av) och sitt
+**bästa resultat** (stjärnor) för varje val – stjärnorna syns på nivåknapparna.
+
+Allt sparas bara på enheten, i webbläsaren. Det synkas inte mellan enheter och försvinner om man
+rensar webbplatsdata i Safari eller tar bort genvägen på hemskärmen.
 
 ## Var ändrar man saker?
 
@@ -57,7 +71,8 @@ Då får spelet en egen ikon (🎒) och öppnas i helskärm som en app.
 | **Engelska:** glosor per årskurs och område, och förväxlingsord | `src/categories/engelska/words.ts` |
 | **Geografi:** svenska landsnamn, världsdel och nivå (1 = Lätt, 2 = Medel, 3 = Svår) | `src/categories/geografi/countries.ts` |
 | **Geografi:** grupper av flaggor som liknar varandra | `src/categories/geografi/flags.ts` |
-| Antal frågor per runda | ⚙️ på startskärmen (3, 5, 10, 15 eller 20). Valen och standardvärdet finns i `src/game/constants.ts` |
+| Antal frågor per runda | ⚙️ på startskärmen (3, 5, 10, 15 eller 20, sparas per profil). Valen och standardvärdet finns i `src/game/constants.ts` |
+| Bilderna man kan välja till sin profil | `src/game/avatars.ts` |
 | Klistermärken och fotbollsspelare | `src/game/stickers.ts` |
 | Hur mycket konfetti det blir | `src/game/celebrate.ts` |
 | Ljuden (pling, applåder, fanfar) | `src/game/sound.ts` |
@@ -106,7 +121,8 @@ ring runt sig så att de går att hitta. Tuvalu saknas i kartdatan.
 
 ## Säkerhet och integritet
 
-- Appen sparar ingenting och skickar inga uppgifter någonstans – inga konton, ingen analys.
+- Appen skickar inga uppgifter någonstans – inga konton, ingen analys. Profiler (namn och en emoji),
+  album och resultat sparas bara i webbläsaren på enheten (localStorage).
 - Typsnittet (Fredoka) ligger i appen själv, så inga anrop går till Google när man spelar.
 - Den färdiga versionen (`npm run build`) har en Content Security Policy: sidan får bara ladda
   kod, stil, bilder, typsnitt och data från sin egen adress.
@@ -129,6 +145,9 @@ npm test
 - **Engelska:** alla engelska ord är rättstavade med brittisk stavning (dictionary-en-gb) och alla svenska
   ord finns i den svenska ordlistan. Varje engelskt och svenskt ord finns bara en gång i hela listan,
   så att en fråga aldrig kan få två rätta svar.
+- **Profiler:** det sparade går att läsa tillbaka likadant, trasig eller okänd data kraschar inte spelet
+  (och sparas undan i stället för att skrivas över), bästa resultat höjs bara när man blivit bättre och
+  spelet fungerar även när webbläsaren inte låter det spara.
 - **Geografi:** varje område i kartdatan är klassat, alla länder har svenskt namn och världsdel,
   varje världsdels karta innehåller exakt sina länder och varje nivå ger 10 olika länder
   (har en nivå för få länder fylls rundan på från närmaste nivå). Varje land har en landskod med en
@@ -141,4 +160,3 @@ npm test
 - Geografi: "Fyll hela kartan" som utmaning
 - Matte: klockan, former, bråk, negativa tal och decimaltal
 - Uppläsning av frågor
-- Spara framsteg (localStorage)

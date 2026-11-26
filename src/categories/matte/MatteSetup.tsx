@@ -30,7 +30,8 @@ export function MatteSetup({ onStart, onBack }: Props) {
         </>
       }
       onBack={() => setOp(null)}
-      onPick={(level) => onStart({ grade, op, level })}
+      choices={{ grade, op }}
+      onStart={onStart}
     />
   )
 }

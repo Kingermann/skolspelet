@@ -22,7 +22,23 @@ Repo: github.com/Kingermann/skolspelet.
 
 React 19, TypeScript 7, Vite 8, Vitest 5, oxlint. Inga routrar eller state-bibliotek – `App.tsx`
 håller allt state i `useState` och väljer skärm med en `Screen`-union
-(`start | setup | play | result | album | settings`). **Ingenting sparas** – omladdning börjar om.
+(`start | setup | play | result | album | settings | profiles | profile-new | profile-edit`).
+
+## Profiler och sparande
+
+- `src/game/profiles.ts` – allt sparande. En enda nyckel i localStorage (`skolspelet`) med
+  `{ version: 1, profiles: Profile[] }`. En profil har namn, emoji-bild, album, `roundLength`,
+  `soundOn` och `best` (bästa stjärnor per `resultKey(kategori, val)`, t.ex. `matte:grade=3,level=medel,op=+`).
+- `App.tsx` håller `data` i state och sparar med en effekt vid varje ändring. Utan vald profil visas
+  bara profilskärmarna (`components/ProfileScreens.tsx`).
+- `parseSavedData` lagar enskilda trasiga fält; går datan inte att läsa alls flyttas den till
+  `skolspelet-trasig` i stället för att skrivas över. Fungerar inte localStorage spelas allt som
+  vanligt utan sparande.
+- **Ändras formatet:** höj `version` och översätt från den gamla i `parseSavedData` – annars
+  försvinner barnens album.
+- `LevelScreen` får kategorins tidigare val (`choices`) och bygger själv `{ ...choices, level }`,
+  så nyckeln för bästa resultat är alltid exakt samma som rundans inställningar.
+- Nya kategorier måste ha inställningar = tidigare val + `level`, med enkla värden (strängar/tal).
 
 ## Arkitektur
 
@@ -82,10 +98,9 @@ håller allt state i `useState` och väljer skärm med en `Screen`-union
 
 Byggt 24–25 nov 2026: Matte → MVP med album → fotbollskort/konfetti → textuppgifter → kategorisystem
 + Geografi (karta) → nivåer → flaggquiz → inställning för antal frågor → säkerhet/CSP → GitHub Pages
-→ Svenska (rättstavning) → Engelska (glosor).
+→ Svenska (rättstavning) → Engelska (glosor) → hemskärmsikon → profiler och sparande (26 nov).
 
 Idéer för nästa steg (se även README):
 - Geografi: huvudstäder i Europa, Sveriges landskap, omvänt flaggquiz, "fyll hela kartan"
 - Matte: klockan, former, bråk, negativa tal, decimaltal
 - Uppläsning av frågor (talsyntesen finns redan i `src/game/speech.ts`)
-- Spara framsteg i localStorage (just nu sparas inget – README säger det uttryckligen)

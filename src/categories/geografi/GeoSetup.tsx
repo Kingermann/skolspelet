@@ -68,7 +68,8 @@ export function GeoSetup({ onStart, onBack }: { onStart: (settings: GeoSettings)
         </>
       }
       onBack={() => setContinent(null)}
-      onPick={(level) => onStart({ mode, continent, level })}
+      choices={{ mode, continent }}
+      onStart={onStart}
     />
   )
 }
