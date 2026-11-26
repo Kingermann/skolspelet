@@ -125,6 +125,26 @@ function Clock({ h, m }: { h: number; m: number }) {
   )
 }
 
+function Grid({ colored }: { colored: number }) {
+  return (
+    <svg className="picture" viewBox="0 0 204 204" role="img" aria-label={`En hundraruta där ${colored} rutor är färgade`}>
+      {Array.from({ length: 100 }, (_, i) => (
+        <rect
+          key={i}
+          x={2 + (i % 10) * 20}
+          y={2 + Math.floor(i / 10) * 20}
+          width="20"
+          height="20"
+          fill={i < colored ? '#9b5cff' : 'white'}
+          stroke="#2b2250"
+          strokeWidth="1.2"
+        />
+      ))}
+      <rect x="2" y="2" width="200" height="200" fill="none" stroke="#2b2250" strokeWidth="3" />
+    </svg>
+  )
+}
+
 export function PictureView({ picture, reveal }: { picture: Picture; reveal: boolean }) {
   switch (picture.kind) {
     case 'pizza':
@@ -135,5 +155,7 @@ export function PictureView({ picture, reveal }: { picture: Picture; reveal: boo
       return <SetOf {...picture} reveal={reveal} />
     case 'clock':
       return <Clock h={picture.h} m={picture.m} />
+    case 'grid':
+      return <Grid colored={picture.colored} />
   }
 }

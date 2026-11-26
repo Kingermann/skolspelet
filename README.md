@@ -12,6 +12,9 @@ fotbollskort och klistermärken!
   | 🕐 Klockan | hel, halv | kvart i/över | fem-minuter (Svår: alla) | hur lång tid? | – | – |
   | 🍕 Bråk | – | hur stor del är färgad? | del av antal (½ av 8) | jämföra | bråk ↔ decimaltal | bråk, decimal, procent |
   | ❓ Ekvationer | ? + 3 = 7 | ? − 4 = 6 | ? × 3 = 12 | x + 7 = 15 | 4x = 28 | 2x + 3 = 11 |
+  | 💯 Procent | – | – | – | hundraruta, 50 % = hälften, 25 % och 10 % av | hundraruta, procent ↔ bråk, 5/20/75 % av | procent av, procent ↔ decimaltal, andel (15 av 60) |
+
+  Procent har också vardagsuppgifter (rabatt och pris) ungefär var tredje gång på Medel och Svår.
 
   Läroplanen anger bara stadier (åk 1–3, 4–6), så fördelningen inom stadiet är ett förslag som går
   att ändra. Nivåerna fungerar som för räknesätten: Lätt = välj bland fyra, Medel = skriv svaret,
@@ -98,7 +101,7 @@ Högst 50 glosor och 40 tecken per ord. Regler och gränser finns i
 | **Matte:** största tal (nu 1000) och andel textuppgifter | `MAX_NUMBER` / `STORY_SHARE` i samma fil |
 | **Matte:** textuppgifterna (berättelser, namn) | `src/categories/matte/stories.ts` |
 | **Matte:** vilka moment som finns i vilken årskurs | `TOPICS_FOR_GRADE` i `src/categories/matte/topics/index.ts` |
-| **Matte:** talföljder, klockslag, bråk och ekvationer per årskurs och nivå | `PATTERNS`, `CLOCK_MINUTES`, `PARTS`/`DECIMAL_DENS`…, `EQUATIONS` i `src/categories/matte/topics/` |
+| **Matte:** talföljder, klockslag, bråk, ekvationer och procent per årskurs och nivå | `PATTERNS`, `CLOCK_MINUTES`, `PARTS`/`DECIMAL_DENS`…, `EQUATIONS`, `PERCENT` i `src/categories/matte/topics/` |
 | **Svenska:** stavningsord per årskurs (lägg gärna till veckoord!) | `src/categories/svenska/words.ts` |
 | **Svenska:** regler för felstavningar och stavningstipsen | `src/categories/svenska/misspell.ts` |
 | **Engelska:** glosor per årskurs och område, och förväxlingsord | `src/categories/engelska/words.ts` |
@@ -183,7 +186,8 @@ npm test
 - **Matte, nya moment:** hundratals uppgifter per årskurs, moment och nivå – rätt svar godtas, exakt
   ett alternativ är rätt och inget fel alternativ råkar vara rätt (2/4 när svaret är 1/2), alla tal
   mellan 0 och 1000, ekvationerna går ihop med svaret, talföljderna följer en regel, klockan visar
-  svaret, bråkbilderna stämmer och en runda har olika uppgifter.
+  svaret, bråkbilderna stämmer och en runda har olika uppgifter. Procent: hundrarutan, "p % av",
+  andelar och rabatter räknas om och kontrolleras; inga rabatter över 50 % och inga halva elever.
 - **Svenska:** varje stavningsord finns i den svenska ordlistan (dictionary-sv), och inget felstavat
   alternativ är ett riktigt ord (t.ex. "koma" eller "hopa"). Skapar reglerna ett riktigt ord säger
   testet exakt vilket som ska läggas till i `realWords.ts`, där sådana ord spärras.
@@ -205,6 +209,6 @@ npm test
 
 - Geografi: huvudstäder i Europa, Sveriges landskap, "välj rätt flagga" (omvänt flaggquiz)
 - Geografi: "Fyll hela kartan" som utmaning
-- Matte: decimaltal, procent och negativa tal som egna moment, former, omkrets och area, enheter,
+- Matte: decimaltal och negativa tal som egna moment, former, omkrets och area, enheter,
   medelvärde – och textuppgifter för bråk och ekvationer
 - Uppläsning av frågor

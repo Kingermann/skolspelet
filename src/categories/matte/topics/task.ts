@@ -32,14 +32,20 @@ export type Picture =
    */
   | { kind: 'set'; emoji: string; total: number; marked: number; group: number }
   | { kind: 'clock'; h: number; m: number }
+  /** Hundraruta (10 × 10) där `colored` rutor är färgade – för procent. */
+  | { kind: 'grid'; colored: number }
 
 export interface Task {
   /** Liten text överst, t.ex. "Vad är klockan?" */
   prompt?: string
   /** Stor text. Innehåller den "?" står svarsrutan där, t.ex. "2, 5, 8, ?" eller "? + 3 = 7". */
   text?: string
+  /** Vardagsuppgift i ord ("En tröja kostar 200 kr …"). Svaret skrivs på en egen rad. */
+  story?: string
   /** Står före svarsrutan på en egen rad när svaret inte är inne i texten, t.ex. "x =". */
   answerPrefix?: string
+  /** Står efter svarsrutan på den egna raden, t.ex. "%" eller "kr". */
+  answerSuffix?: string
   picture?: Picture
   answer: Answer
   /** Svarsalternativ: alltid på Lätt, och för uppgifter som bara går att välja. */

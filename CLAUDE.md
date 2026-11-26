@@ -75,7 +75,7 @@ håller allt state i `useState` och väljer skärm med en `Screen`-union
 | Kategori | Kärnfiler | Notering |
 |---|---|---|
 | Matte | `generator.ts`, `config.ts`, `stories.ts` | Talområden per årskurs × nivå. ~30 % textuppgifter. Max 1000, bara heltal ≥ 0. |
-| Matte – moment | `topics/` | Bråk, ekvationer, klockan, mönster (`TOPICS_FOR_GRADE`). `MatteRound` skickar dem till `TopicRound`; `op` i inställningarna är räknesätt eller moment. Svar kan vara heltal, decimaltal, bråk, klocktid eller val (`topics/task.ts`). Bilder ritas som SVG i `Pictures.tsx`; `{3/4}` i text blir ett riktigt bråk. Inga textuppgifter än. |
+| Matte – moment | `topics/` | Bråk, ekvationer, klockan, mönster, procent (`TOPICS_FOR_GRADE`; procent åk 4–6, "% av" ligger bara under Procent, inte Bråk). Uppgifter kan ha `story` + `answerSuffix` ("kr", "%") – just nu bara procent. `MatteRound` skickar dem till `TopicRound`; `op` i inställningarna är räknesätt eller moment. Svar kan vara heltal, decimaltal, bråk, klocktid eller val (`topics/task.ts`). Bilder ritas som SVG i `Pictures.tsx`; `{3/4}` i text blir ett riktigt bråk. Inga textuppgifter än. |
 | Svenska | `words.ts`, `misspell.ts`, `realWords.ts` | Felstavningar skapas med regler. Felstavningar som råkar bli riktiga ord spärras i `realWords.ts`. |
 | Engelska | `words.ts`, `quiz.ts`, `homework.ts` | Två lägen (`EngelskaPlay` väljer runda): spelets glosor (årskurs, riktning, nivå, fyra alternativ, förväxlingsord på Svår) och läxglosor (`HomeworkSetup`/`HomeworkRound`: egna glosor i profilen, man skriver svaret, inga nivåer, inget bästa resultat sparas). |
 | Geografi | `countries.ts`, `map.ts`, `WorldMap.tsx`, `flags.ts` | Kartspel (d3-geo/zoom + world-atlas) och flaggquiz (flag-icons). Nivå 1–3 per land. |
@@ -114,10 +114,10 @@ håller allt state i `useState` och väljer skärm med en `Screen`-union
 Byggt 24–25 nov 2026: Matte → MVP med album → fotbollskort/konfetti → textuppgifter → kategorisystem
 + Geografi (karta) → nivåer → flaggquiz → inställning för antal frågor → säkerhet/CSP → GitHub Pages
 → Svenska (rättstavning) → Engelska (glosor) → hemskärmsikon → profiler och sparande → läxglosor i Engelska → säkerhet (talsyntes) → nya mattemoment:
-bråk, ekvationer, klockan, mönster (26 nov). Lgr22 anger bara stadier; fördelningen per årskurs är vårt förslag.
+bråk, ekvationer, klockan, mönster, procent (26 nov). Lgr22 anger bara stadier; fördelningen per årskurs är vårt förslag.
 Layouten är mätt så att ✓ syns utan scroll på iPhone SE (667 px), iPhone 14 och iPad.
 
 Idéer för nästa steg (se även README):
 - Geografi: huvudstäder i Europa, Sveriges landskap, omvänt flaggquiz, "fyll hela kartan"
-- Matte: decimaltal, procent och negativa tal som egna moment, former, omkrets/area, enheter, medelvärde; textuppgifter för bråk och ekvationer
+- Matte: decimaltal och negativa tal som egna moment, former, omkrets/area, enheter, medelvärde; textuppgifter för bråk och ekvationer
 - Uppläsning av frågor (talsyntesen finns redan i `src/game/speech.ts`)

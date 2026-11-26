@@ -182,7 +182,8 @@ function percent(level: Level): Task {
   const [n, d] = pickFraction(PERCENT_DENS[level])
   const p = Math.round(value(n, d) * 100)
   const easy = level === 'latt'
-  const kinds = level === 'svar' ? ['frac', 'dec', 'toFrac', 'toDec', 'of'] : ['frac', 'dec', 'toFrac']
+  // "20 % av 300" finns under Procent – här bara sambanden bråk ↔ decimaltal ↔ procent.
+  const kinds = level === 'svar' ? ['frac', 'dec', 'toFrac', 'toDec'] : ['frac', 'dec', 'toFrac']
   const kind = pickOne(kinds)
   const pctWrong = (extra: number[]) => intChoices(p, [...extra, p / 10, p * 10, 100 - p, n * 10 + d], 100)
 
@@ -191,36 +192,26 @@ function percent(level: Level): Task {
     const task: Task = {
       text: `${shown} = ? %`,
       answer: { kind: 'int', value: p },
-      solution: `${kind === 'frac' ? plain(n, d) : fmtDecimal(value(n, d))} = ${p} %`,
+      solution: `${kind === 'frac' ? plain(n, d) : fmtDecimal(value(n, d))} = ${p} %`,
     }
     return withChoices(task, { label: `${p}`, correct: true }, pctWrong(kind === 'frac' ? [n, d, Number(`${n}${d}`)] : []), easy)
   }
   if (kind === 'toFrac') {
     const task: Task = {
-      text: `${p} % = ?`,
+      text: `${p} % = ?`,
       answer: { kind: 'fraction', num: n, den: d, equivalent: true },
-      solution: `${p} % = ${plain(p, 100)} = ${plain(n, d)}`,
+      solution: `${p} % = ${plain(p, 100)} = ${plain(n, d)}`,
     }
     const wrong = fractionWrongs(n, d, [[1, p], [p, 10], [1, Math.max(2, Math.round(100 / p) + 1)], [n, d + 1], [d - n, d]])
     return withChoices(task, fracChoice(n, d, true), wrong, easy)
   }
-  if (kind === 'toDec') {
-    const task: Task = {
-      text: `${p} % = ?`,
-      answer: { kind: 'decimal', value: p / 100 },
-      solution: `${p} % = ${fmtDecimal(p / 100)}`,
-    }
-    return withChoices(task, { label: fmtDecimal(p / 100), correct: true }, decimalWrongs(n, d), easy)
-  }
-  // "20 % av 300"
-  const whole = pickOne([100, 200, 300, 400, 500, 600, 800, 1000].filter((w) => (w * p) % 100 === 0))
-  const answer = (whole * p) / 100
+  // toDec
   const task: Task = {
-    text: `${p} % av ${whole} = ?`,
-    answer: { kind: 'int', value: answer },
-    solution: `${p} % av ${whole} = ${plain(n, d)} av ${whole} = ${answer}`,
+    text: `${p} % = ?`,
+    answer: { kind: 'decimal', value: p / 100 },
+    solution: `${p} % = ${fmtDecimal(p / 100)}`,
   }
-  return withChoices(task, { label: String(answer), correct: true }, intChoices(answer, [whole - answer, p, whole / p, answer * 10]), easy)
+  return withChoices(task, { label: fmtDecimal(p / 100), correct: true }, decimalWrongs(n, d), easy)
 }
 
 export function generateFraction(grade: Grade, level: Level): Task {

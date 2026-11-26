@@ -72,6 +72,7 @@ describe.each(combos)('åk %i, %s, %s', (grade, topic, level) => {
 
   it('alla tal är heltal mellan 0 och 1000 (utom decimaltal)', () => {
     for (const t of tasks) {
+      if (t.story) expect(t.story, t.story).not.toMatch(/\d[.,]\d/)
       const numbers = `${t.text ?? ''} ${t.solution}`.replace(/\d+,\d+/g, '').match(/-?\d+/g) ?? []
       for (const n of numbers) expect(Number(n), t.solution).toBeGreaterThanOrEqual(0)
       for (const n of numbers) expect(Number(n), t.solution).toBeLessThanOrEqual(1000)
@@ -81,7 +82,7 @@ describe.each(combos)('åk %i, %s, %s', (grade, topic, level) => {
 
   it('en runda har olika uppgifter', () => {
     const round = generateTopicRound(grade, level, topic, 10)
-    const keys = round.map((t) => JSON.stringify([t.text, t.picture, t.prompt, t.choices?.map((c) => c.label).sort()]))
+    const keys = round.map((t) => JSON.stringify([t.text, t.story, t.picture, t.prompt, t.choices?.map((c) => c.label).sort()]))
     expect(new Set(keys).size).toBeGreaterThanOrEqual(8)
   })
 
@@ -144,6 +145,42 @@ describe.each(combos)('åk %i, %s, %s', (grade, topic, level) => {
     })
   }
 
+  if (topic === 'procent') {
+    it('procenten stämmer: hundraruta, "p % av", andel, rabatt och pris', () => {
+      for (const t of tasks) {
+        const value = (t.answer as { value?: number }).value
+        if (t.picture?.kind === 'grid') expect(t.picture.colored).toBe(value)
+        const of = t.text?.match(/^(\d+)\s%\sav (\d+) = \?$/)
+        if (of) expect((Number(of[1]) * Number(of[2])) / 100).toBe(value)
+        const share = t.text?.match(/^(\d+) av (\d+) = \?\s%$/)
+        if (share) expect((Number(share[1]) * 100) / Number(share[2])).toBe(value)
+        const story = t.solution.match(/^(\d+)\s%\sav (\d+)\skr = (\d+)\skr(?:, (\d+) − (\d+) = (\d+)\skr)?$/)
+        if (t.story && story) {
+          const [, p, price, off, , , now] = story.map(Number)
+          expect((p * price) / 100).toBe(off)
+          expect(t.story).toContain(`${price}\u00a0kr`)
+          if (story[4]) expect(now).toBe(price - off)
+          expect(p, t.story).toBeLessThanOrEqual(50)
+          if (t.answer.kind === 'int') expect(t.answer.value).toBe(story[4] ? now : off)
+        }
+        const cyklar = t.story?.match(/har (\d+) elever\. (\d+) av dem/)
+        if (cyklar) expect((Number(cyklar[2]) * 100) / Number(cyklar[1])).toBe(value)
+        if (t.story) expect(cyklar || story, t.story).toBeTruthy()
+        // Varje uppgift har en känd form – annars hoppas kontrollerna ovan över i tysthet.
+        const known = [/^\d+\s%\s= \?$/, /^\{\d+\/\d+\} = \?\s%$/, /^0,\d+ = \?\s%$/]
+        if (t.text) expect(of || share || known.some((k) => k.test(t.text!)), t.text).toBeTruthy()
+        if (!t.text && !t.story) expect(t.picture?.kind).toBe('grid')
+      }
+    })
+    if (level !== 'latt' && grade !== 4) {
+      it('ungefär var tredje uppgift är en vardagsuppgift', () => {
+        const share = tasks.filter((t) => t.story).length / tasks.length
+        expect(share).toBeGreaterThan(0.15)
+        expect(share).toBeLessThan(0.5)
+      })
+    }
+  }
+
   if (topic === 'brak') {
     it('bilden och texten stämmer med svaret', () => {
       for (const t of tasks) {
@@ -158,7 +195,7 @@ describe.each(combos)('åk %i, %s, %s', (grade, topic, level) => {
         if (conv && t.answer.kind === 'decimal') expect(t.answer.value).toBeCloseTo(Number(conv[1]) / Number(conv[2]), 9)
         const ofMatch = t.text?.match(/^\{(\d+)\/(\d+)\} av (\d+) = \?$/)
         if (ofMatch) expect(Number(ofMatch[1]) * (Number(ofMatch[3]) / Number(ofMatch[2]))).toBe((t.answer as { value: number }).value)
-        const pct = t.text?.match(/^(\d+) % av (\d+) = \?$/)
+        const pct = t.text?.match(/^(\d+)\s%\sav (\d+) = \?$/)
         if (pct) expect((Number(pct[1]) * Number(pct[2])) / 100).toBe((t.answer as { value: number }).value)
       }
     })

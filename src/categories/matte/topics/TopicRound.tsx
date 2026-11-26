@@ -151,7 +151,7 @@ function TopicQuestion({ flow }: { flow: RoundFlow<Task> }) {
   // frågetecken medan man väljer, och inget när svaret var ett ord ("halv fyra" står i lösningen).
   const correctChoice = choices?.find((c) => c.correct)
   const showAnswerLine =
-    !inline && (task.answerPrefix || !choices || done) && !(done && task.answer.kind === 'choice' && !correctChoice?.frac)
+    !inline && (task.answerPrefix || task.answerSuffix || !choices || done) && !(done && task.answer.kind === 'choice' && !correctChoice?.frac)
   const wrongLeft = (choices ?? []).filter((c) => !c.correct && !removed.includes(c.label))
 
   return (
@@ -159,6 +159,7 @@ function TopicQuestion({ flow }: { flow: RoundFlow<Task> }) {
       <div className={`card topic-card phase-${phase}`} key={attempts}>
         {task.prompt && <p className="topic-prompt">{task.prompt}</p>}
         {task.picture && <PictureView picture={task.picture} reveal={phase === 'reveal'} />}
+        {task.story && <p className="story">{task.story}</p>}
         {task.text && (
           <div className={`problem topic-text ${task.text.length > 14 ? 'problem-long' : ''}`}>
             <RichText text={task.text} slot={slot} />
@@ -168,6 +169,7 @@ function TopicQuestion({ flow }: { flow: RoundFlow<Task> }) {
           <div className="problem topic-answer-line">
             {task.answerPrefix && <span>{task.answerPrefix} </span>}
             {slot}
+            {task.answerSuffix && <span> {task.answerSuffix}</span>}
           </div>
         )}
         <div className="message">{message}</div>
