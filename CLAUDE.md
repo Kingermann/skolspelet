@@ -100,6 +100,13 @@ håller allt state i `useState` och väljer skärm med en `Screen`-union
   får inte kräva externa domäner, inline-skript eller `eval`.
 - Dev-servern lyssnar bara på localhost; `dev:lan` är ett uttryckligt val.
 - `allowScripts` i `package.json` styr vilka paket som får köra installationsskript.
+- Allt som sparas (barnens namn, läxglosor) stannar på enheten. Användarinmatning visas bara som
+  React-text – aldrig `dangerouslySetInnerHTML`. Läst data valideras i `parseSavedData` och har tak
+  (namnlängd, antal profiler och glosor).
+- Talsyntes: `pickVoice` väljer bara röster med `localService` – fjärr-röster skickar texten till en
+  server. Ändra inte till webbläsarens standardröst.
+- GitHub Pages delar origin (`<användare>.github.io`) mellan kontots alla projekt, och därmed
+  localStorage. Ingen kod från tredje part får finnas på någon av kontots Pages-sidor.
 
 ## Status (senast uppdaterad 2026-11-26)
 

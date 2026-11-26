@@ -141,6 +141,14 @@ ring runt sig så att de går att hitta. Tuvalu saknas i kartdatan.
 
 - Appen skickar inga uppgifter någonstans – inga konton, ingen analys. Profiler (namn och en emoji),
   album och resultat sparas bara i webbläsaren på enheten (localStorage).
+- **Radera allt sparat:** ta bort genvägen på hemskärmen (eller Inställningar → Safari → Avancerat →
+  Webbplatsdata). En borttagen profil raderas direkt från enheten.
+- 🔊 använder bara röster som finns på enheten. Vissa webbläsare (t.ex. Chromes "Google"-röster)
+  läser upp via en server – de används aldrig, eftersom läxglosorna är text barnen skrivit själva.
+  Finns ingen engelsk röst på enheten blir det tyst i stället.
+- **Andra sidor på samma GitHub-konto:** alla GitHub Pages-projekt under samma konto delar adress
+  (`<användare>.github.io`) och därmed lagring. Publicera därför inga andra sidor där med kod från
+  andra (t.ex. analys eller annonser) – den skulle kunna läsa barnens namn och glosor.
 - Typsnittet (Fredoka) ligger i appen själv, så inga anrop går till Google när man spelar.
 - Den färdiga versionen (`npm run build`) har en Content Security Policy: sidan får bara ladda
   kod, stil, bilder, typsnitt och data från sin egen adress.
