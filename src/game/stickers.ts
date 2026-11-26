@@ -31,6 +31,8 @@ export type Sticker = EmojiSticker | PlayerSticker
 const SWEDEN = { flag: '🇸🇪', shirt: '#fecc02', numberColor: '#006aa7' }
 const SPAIN = { flag: '🇪🇸', shirt: '#c60b1e', numberColor: '#ffc400' }
 const BRAZIL = { flag: '🇧🇷', shirt: '#fedf00', numberColor: '#009c3b' }
+/** Kareby IS (Kungälv): rött, blått och vitt – röd tröja med vitt nummer syns bäst på kortet. */
+const KAREBY = { flag: '🇸🇪', shirt: '#d7141a', numberColor: '#ffffff' }
 const ENGLAND = { flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', shirt: '#ffffff', numberColor: '#0b1f4b' }
 
 export const PLAYERS: PlayerSticker[] = (
@@ -42,15 +44,18 @@ export const PLAYERS: PlayerSticker[] = (
     { id: 'zlatan', name: 'Zlatan Ibrahimović', number: 10, ...SWEDEN },
     { id: 'isak', name: 'Alexander Isak', number: 9, ...SWEDEN },
     { id: 'asllani', name: 'Kosovare Asllani', number: 9, ...SWEDEN },
+    { id: 'gyokeres', name: 'Viktor Gyökeres', number: 17, ...SWEDEN },
+    { id: 'carlsbogard', name: 'Mimmi Carlsbogård', number: 1, ...SWEDEN },
     { id: 'neymar', name: 'Neymar Jr', number: 10, ...BRAZIL },
     { id: 'vinicius', name: 'Vinícius Júnior', number: 7, ...BRAZIL },
     { id: 'kane', name: 'Harry Kane', number: 9, ...ENGLAND },
     { id: 'bellingham', name: 'Jude Bellingham', number: 10, ...ENGLAND },
     { id: 'yamal', name: 'Lamine Yamal', number: 19, ...SPAIN },
     { id: 'putellas', name: 'Alexia Putellas', number: 11, ...SPAIN },
-    { id: 'bonmati', name: 'Aitana Bonmatí', number: 6, ...SPAIN },
     { id: 'salah', name: 'Mohamed Salah', number: 10, flag: '🇪🇬', shirt: '#ce1126', numberColor: '#ffffff' },
     { id: 'modric', name: 'Luka Modrić', number: 10, flag: '🇭🇷', shirt: '#e30a17', numberColor: '#ffffff' },
+    { id: 'dylan', name: 'Dylan B', number: 13, ...KAREBY },
+    { id: 'mila', name: 'Mila B', number: 2, ...KAREBY },
   ] satisfies Omit<PlayerSticker, 'kind'>[]
 ).map((p) => ({ ...p, kind: 'player' as const }))
 
