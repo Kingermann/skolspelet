@@ -1,6 +1,6 @@
 import type { Category } from '../categories/types'
 import type { Profile } from '../game/profiles'
-import { ALL_STICKERS, EMOJI_STICKERS, PLAYERS } from '../game/stickers'
+import { ALL_STICKERS, EMOJI_STICKERS, PLAYERS, stickerById } from '../game/stickers'
 import { Header } from './Header'
 import { MissingPlayerCard, StickerView } from './StickerView'
 import { tap } from './tap'
@@ -40,7 +40,7 @@ export function StartScreen({ categories, profile, onPick, onAlbum, onSettings, 
           ))}
         </div>
         <button className="big-btn secondary" onClick={tap(onAlbum)}>
-          📒 Mitt album <span className="badge">{new Set(profile.album).size}</span>
+          📒 Mitt album <span className="badge">{new Set(profile.album.filter((id) => stickerById(id))).size}</span>
         </button>
       </div>
     </div>
@@ -50,7 +50,8 @@ export function StartScreen({ categories, profile, onPick, onAlbum, onSettings, 
 // ---------- Album ----------
 
 export function AlbumScreen({ album, onBack }: { album: string[]; onBack: () => void }) {
-  const owned = new Set(album)
+  // Bara klistermärken som finns kvar i spelet räknas – en borttagen spelare ska inte ge 57 / 56.
+  const owned = new Set(album.filter((id) => stickerById(id)))
   const count = (id: string) => album.filter((a) => a === id).length
   const badge = (id: string) => count(id) > 1 && <span className="sticker-count">×{count(id)}</span>
   return (
