@@ -5,6 +5,8 @@ import {
   BROKEN_KEY,
   EMPTY_DATA,
   freeAvatar,
+  HOMEWORK_TEXT_MAX,
+  MAX_HOMEWORK,
   loadData,
   MAX_PROFILES,
   NAME_MAX_LENGTH,
@@ -108,6 +110,42 @@ describe('sparad data', () => {
   })
 })
 
+describe('läxglosor i sparad data', () => {
+  it('profiler sparade innan läxglosorna fanns får en tom lista', () => {
+    const raw = JSON.stringify({ version: 1, profiles: [{ id: 'ella', name: 'Ella' }] })
+    expect(parseSavedData(raw)!.profiles[0].homework).toEqual([])
+  })
+
+  it('trasiga glosor slängs, för långa kortas, dubbla id ersätts och listan har ett tak', () => {
+    const many = Array.from({ length: MAX_HOMEWORK + 5 }, (_, i) => ({ id: `g${i}`, en: `w${i}`, sv: `o${i}` }))
+    const raw = JSON.stringify({
+      version: 1,
+      profiles: [
+        {
+          id: 'ella',
+          name: 'Ella',
+          homework: [
+            { id: 'a', en: ' dog ', sv: 'hund' },
+            { id: 'a', en: 'cat', sv: 'katt' },
+            { en: 'x'.repeat(100), sv: 'lång' },
+            { id: 'b', en: '', sv: 'tom' },
+            { id: 'c', en: 'horse' },
+            'skräp',
+            ...many,
+          ],
+        },
+      ],
+    })
+    const hw = parseSavedData(raw)!.profiles[0].homework
+    expect(hw[0]).toEqual({ id: 'a', en: 'dog', sv: 'hund' })
+    expect(hw[1].en).toBe('cat')
+    expect(hw[1].id).not.toBe('a')
+    expect(hw[2].en.length).toBe(HOMEWORK_TEXT_MAX)
+    expect(hw.length).toBe(MAX_HOMEWORK)
+    expect(new Set(hw.map((g) => g.id)).size).toBe(hw.length)
+  })
+})
+
 describe('profiler', () => {
   it('namnet måste finnas, vara kort nog och inte redan användas', () => {
     expect(nameProblem('', [])).not.toBeNull()
@@ -154,5 +192,11 @@ describe('resultat', () => {
     expect(p.best.k).toBe(3)
     expect(p.album).toEqual(['messi', 'messi', '🐶'])
     expect(ella.album).toEqual([])
+  })
+
+  it('läxrundor (utan nyckel) ger klistermärke men sparar inget bästa resultat', () => {
+    const p = recordRound(ella, null, 3, 'messi')
+    expect(p.album).toEqual(['messi'])
+    expect(p.best).toEqual({})
   })
 })

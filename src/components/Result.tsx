@@ -12,12 +12,14 @@ interface Props {
   firstTryCorrect: number
   total: number
   sticker: Sticker
+  /** Det man missade och bör öva mer på (t.ex. läxglosor). */
+  practiceMore?: string[]
   onAgain: () => void
   onHome: () => void
   onAlbum: () => void
 }
 
-export function Result({ firstTryCorrect, total, sticker, onAgain, onHome, onAlbum }: Props) {
+export function Result({ firstTryCorrect, total, sticker, practiceMore, onAgain, onHome, onAlbum }: Props) {
   const stars = starsFor(firstTryCorrect, total)
 
   useEffect(() => {
@@ -45,6 +47,16 @@ export function Result({ firstTryCorrect, total, sticker, onAgain, onHome, onAlb
         <p className="result-text">
           Du fick <strong>{firstTryCorrect}</strong> av {total} rätt på första försöket!
         </p>
+        {practiceMore && practiceMore.length > 0 && (
+          <div className="practice-more">
+            <h3>📌 Öva mer på</h3>
+            <ul>
+              {practiceMore.map((p) => (
+                <li key={p}>{p}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="new-sticker">
           <span className="new-sticker-label">
             {sticker.kind === 'player' ? 'Nytt fotbollskort! ⚽' : 'Nytt klistermärke!'}

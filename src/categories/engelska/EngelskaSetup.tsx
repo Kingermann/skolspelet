@@ -5,7 +5,8 @@ import { LevelScreen } from '../../components/LevelScreen'
 import { tap } from '../../components/tap'
 import type { Grade } from '../../game/grades'
 import type { Level } from '../../game/levels'
-import type { EngelskaSettings } from './GlossRound'
+import type { EngelskaSettings } from './EngelskaPlay'
+import { HomeworkSetup } from './HomeworkSetup'
 import type { DirectionChoice } from './quiz'
 
 const LEVEL_TEXTS: Record<Level, string> = {
@@ -20,12 +21,40 @@ const DIRECTIONS: Record<DirectionChoice, { icon: string; label: string; text: s
   mix: { icon: '🔀', label: 'Blandat', text: 'Båda hållen om vartannat', color: '#ff6f91' },
 }
 
-/** Engelska: välj årskurs → riktning → nivå. */
+type Source = 'spelet' | 'laxa'
+
+/** Engelska: spelets glosor (årskurs → riktning → nivå) eller mina läxglosor. */
 export function EngelskaSetup({ onStart, onBack }: { onStart: (settings: EngelskaSettings) => void; onBack: () => void }) {
+  const [source, setSource] = useState<Source | null>(null)
   const [grade, setGrade] = useState<Grade | null>(null)
   const [direction, setDirection] = useState<DirectionChoice | null>(null)
 
-  if (grade === null) return <GradeScreen chips={<span className="chip">🇬🇧 Engelska</span>} onBack={onBack} onPick={setGrade} />
+  if (source === null) {
+    return (
+      <div className="screen">
+        <Header onBack={onBack}>
+          <span className="chip">🇬🇧 Engelska</span>
+        </Header>
+        <h2 className="question-title">Vilka glosor?</h2>
+        <div className="grid grid-1">
+          <button className="tile tile-row tile-mode" style={{ background: '#3da5ff' }} onClick={tap(() => setSource('spelet'))}>
+            <span className="tile-big">📚 Spelets glosor</span>
+            <span className="tile-small">Glosor för din årskurs</span>
+          </button>
+          <button className="tile tile-row tile-mode" style={{ background: '#ff9f1c' }} onClick={tap(() => setSource('laxa'))}>
+            <span className="tile-big">📝 Mina läxglosor</span>
+            <span className="tile-small">Skriv in veckans glosor och bli förhörd</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (source === 'laxa') return <HomeworkSetup onStart={onStart} onBack={() => setSource(null)} />
+
+  if (grade === null) {
+    return <GradeScreen chips={<span className="chip">🇬🇧 Engelska</span>} onBack={() => setSource(null)} onPick={setGrade} />
+  }
 
   const gradeChip = <span className="chip">🇬🇧 Åk {grade}</span>
   if (direction === null) {

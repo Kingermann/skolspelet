@@ -7,26 +7,26 @@ import { LEVEL_STYLE, type Level } from '../../game/levels'
 import { randomOf } from '../../game/random'
 import { canSpeak, speak } from '../../game/speech'
 import { useRoundFlow, type RoundFlow } from '../../game/useRoundFlow'
-import { makeRound, type DirectionChoice, type GlossQuestion } from './quiz'
+import { DIRECTION_ICON, makeRound, type DirectionChoice, type GlossQuestion } from './quiz'
 import type { Gloss } from './words'
 
-export interface EngelskaSettings {
+/** Spelets egna glosor: årskurs, riktning och nivå. */
+export interface GlossSettings {
   grade: Grade
   direction: DirectionChoice
   level: Level
 }
 
 interface Props {
-  settings: EngelskaSettings
+  settings: GlossSettings
   onFinish: (firstTryCorrect: number, total: number) => void
   onQuit: () => void
 }
 
 const RETRY = ['Inte riktigt 🤔 Försök igen!', 'Nästan! Ett försök till 💪', 'Nej – tänk efter en gång till! 🍀']
-const DIRECTION_ICON: Record<DirectionChoice, string> = { 'en-sv': '🇬🇧→🇸🇪', 'sv-en': '🇸🇪→🇬🇧', mix: '🔀' }
 
 /** 🔊-knapp som läser upp ett engelskt ord. */
-function SpeakButton({ word, small = false }: { word: string; small?: boolean }) {
+export function SpeakButton({ word, small = false }: { word: string; small?: boolean }) {
   if (!canSpeak()) return null
   return (
     <button className={`speak-btn ${small ? 'speak-btn-small' : ''}`} onClick={() => speak(word)} aria-label={`Lyssna på ${word}`}>

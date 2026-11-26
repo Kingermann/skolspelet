@@ -20,8 +20,8 @@ const CELEBRATION_MS = 1600
 interface Options<T> {
   /** Skapar rundans frågor (anropas en gång). */
   makeItems: () => T[]
-  /** Anropas när rundan är slut: antal rätt på första försöket och antal frågor. */
-  onFinish: (firstTryCorrect: number, total: number) => void
+  /** Anropas när rundan är slut: antal rätt på första försöket, antal frågor, och hur det gick på varje fråga. */
+  onFinish: (firstTryCorrect: number, total: number, marks: Mark[], items: T[]) => void
 }
 
 export function useRoundFlow<T>({ makeItems, onFinish }: Options<T>) {
@@ -74,7 +74,7 @@ export function useRoundFlow<T>({ makeItems, onFinish }: Options<T>) {
       setPhase('answering')
       setMessage('')
     } else {
-      onFinish(marks.filter((m) => m === 'first').length, items.length)
+      onFinish(marks.filter((m) => m === 'first').length, items.length, marks, items)
     }
   }
 

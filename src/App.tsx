@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CATEGORIES } from './categories'
-import type { Category } from './categories/types'
+import type { Category, RoundSummary } from './categories/types'
 import { AlbumScreen, StartScreen } from './components/Menus'
 import { ProfileEditScreen, WhoIsPlayingScreen } from './components/ProfileScreens'
 import { Result } from './components/Result'
@@ -51,7 +51,9 @@ export default function App() {
   const [category, setCategory] = useState<Category<unknown>>(CATEGORIES[0])
   const [settings, setSettings] = useState<unknown>(null)
   const [playId, setPlayId] = useState(0)
-  const [result, setResult] = useState<{ firstTryCorrect: number; total: number; sticker: Sticker } | null>(null)
+  const [result, setResult] = useState<{ firstTryCorrect: number; total: number; sticker: Sticker; practiceMore?: string[] } | null>(
+    null,
+  )
   const [albumBack, setAlbumBack] = useState<Screen>('start')
   // Ljudet innan någon profil är vald (t.ex. på "Vem spelar?").
   const [soundWithoutProfile, setSoundWithoutProfile] = useState(true)
@@ -88,6 +90,10 @@ export default function App() {
         if (profile) updateProfile(profile.id, (p) => ({ ...p, roundLength: n }))
       },
       bestStars: (choices: object) => profile?.best[resultKey(category.id, choices)],
+      homework: profile?.homework ?? [],
+      setHomework: (list: Profile['homework']) => {
+        if (profile) updateProfile(profile.id, (p) => ({ ...p, homework: list }))
+      },
     }),
     [profile, category],
   )
@@ -98,13 +104,13 @@ export default function App() {
     setScreen('play')
   }
 
-  function finish(firstTryCorrect: number, total: number) {
+  function finish(firstTryCorrect: number, total: number, summary?: RoundSummary) {
     const sticker = pickSticker(profile?.album ?? [])
     if (profile) {
-      const key = resultKey(category.id, settings as object)
+      const key = summary?.saveBest === false ? null : resultKey(category.id, settings as object)
       updateProfile(profile.id, (p) => recordRound(p, key, starsFor(firstTryCorrect, total), sticker.id))
     }
-    setResult({ firstTryCorrect, total, sticker })
+    setResult({ firstTryCorrect, total, sticker, practiceMore: summary?.practiceMore })
     setScreen('result')
   }
 

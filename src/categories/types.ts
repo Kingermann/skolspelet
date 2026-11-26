@@ -1,5 +1,13 @@
 import type { ComponentType } from 'react'
 
+/** Extra om en färdig runda, utöver antal rätt. */
+export interface RoundSummary {
+  /** Visas på resultatskärmen under "Öva mer på", t.ex. "horse = häst". */
+  practiceMore?: string[]
+  /** false = spara inget bästa resultat (t.ex. läxglosor, som byts varje vecka). */
+  saveBest?: boolean
+}
+
 /**
  * En kategori i Skolspelet (Matte, Geografi, …).
  *
@@ -17,8 +25,12 @@ export interface Category<Settings> {
   color: string
   /** Valen innan rundan (t.ex. årskurs och nivå). Anropar onStart när allt är valt. */
   Setup: ComponentType<{ onStart: (settings: Settings) => void; onBack: () => void }>
-  /** Själva rundan. Anropar onFinish med antal rätt på första försöket och antal frågor. */
-  Play: ComponentType<{ settings: Settings; onFinish: (firstTryCorrect: number, total: number) => void; onQuit: () => void }>
+  /** Själva rundan. Anropar onFinish med antal rätt på första försöket, antal frågor och ev. sammanfattning. */
+  Play: ComponentType<{
+    settings: Settings
+    onFinish: (firstTryCorrect: number, total: number, summary?: RoundSummary) => void
+    onQuit: () => void
+  }>
 }
 
 /** Gör en kategori med egna inställningar till en "vanlig" kategori som App kan hantera. */

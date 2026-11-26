@@ -39,6 +39,13 @@ håller allt state i `useState` och väljer skärm med en `Screen`-union
 - `LevelScreen` får kategorins tidigare val (`choices`) och bygger själv `{ ...choices, level }`,
   så nyckeln för bästa resultat är alltid exakt samma som rundans inställningar.
 - Nya kategorier måste ha inställningar = tidigare val + `level`, med enkla värden (strängar/tal).
+  Undantag: läxglosor (`{ homework: true, direction }`) har ingen nivå och skickar
+  `saveBest: false` i `onFinish`.
+- `Play` får skicka en `RoundSummary` som tredje argument till `onFinish`: `practiceMore`
+  (visas som "Öva mer på" på resultatskärmen) och `saveBest`. `useRoundFlow` skickar med
+  `marks` och `items` så att rundan kan räkna ut det.
+- Profilens `homework` kom till efter version 1 och läses som tom lista om den saknas – nya
+  fält som har ett vettigt standardvärde behöver alltså ingen ny version.
 
 ## Arkitektur
 
@@ -69,7 +76,7 @@ håller allt state i `useState` och väljer skärm med en `Screen`-union
 |---|---|---|
 | Matte | `generator.ts`, `config.ts`, `stories.ts` | Talområden per årskurs × nivå. ~30 % textuppgifter. Max 1000, bara heltal ≥ 0. |
 | Svenska | `words.ts`, `misspell.ts`, `realWords.ts` | Felstavningar skapas med regler. Felstavningar som råkar bli riktiga ord spärras i `realWords.ts`. |
-| Engelska | `words.ts`, `quiz.ts` | Glosor per årskurs och område, brittisk stavning. Riktning en→sv, sv→en eller blandat. Förväxlingsord på Svår. |
+| Engelska | `words.ts`, `quiz.ts`, `homework.ts` | Två lägen (`EngelskaPlay` väljer runda): spelets glosor (årskurs, riktning, nivå, fyra alternativ, förväxlingsord på Svår) och läxglosor (`HomeworkSetup`/`HomeworkRound`: egna glosor i profilen, man skriver svaret, inga nivåer, inget bästa resultat sparas). |
 | Geografi | `countries.ts`, `map.ts`, `WorldMap.tsx`, `flags.ts` | Kartspel (d3-geo/zoom + world-atlas) och flaggquiz (flag-icons). Nivå 1–3 per land. |
 
 ## Konventioner
@@ -98,7 +105,7 @@ håller allt state i `useState` och väljer skärm med en `Screen`-union
 
 Byggt 24–25 nov 2026: Matte → MVP med album → fotbollskort/konfetti → textuppgifter → kategorisystem
 + Geografi (karta) → nivåer → flaggquiz → inställning för antal frågor → säkerhet/CSP → GitHub Pages
-→ Svenska (rättstavning) → Engelska (glosor) → hemskärmsikon → profiler och sparande (26 nov).
+→ Svenska (rättstavning) → Engelska (glosor) → hemskärmsikon → profiler och sparande → läxglosor i Engelska (26 nov).
 
 Idéer för nästa steg (se även README):
 - Geografi: huvudstäder i Europa, Sveriges landskap, omvänt flaggquiz, "fyll hela kartan"

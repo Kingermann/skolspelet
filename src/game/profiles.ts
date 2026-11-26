@@ -18,6 +18,16 @@ export const BROKEN_KEY = 'skolspelet-trasig'
 export const NAME_MAX_LENGTH = 15
 /** Fler profiler än så får inte plats snyggt på "Vem spelar?". */
 export const MAX_PROFILES = 8
+/** Högst så här många läxglosor, och så här långa (per språk). */
+export const MAX_HOMEWORK = 50
+export const HOMEWORK_TEXT_MAX = 40
+
+/** En glosa man skrivit in själv. `/` mellan flera rätta svar, t.ex. "you are / you're". */
+export interface HomeworkGloss {
+  id: string
+  en: string
+  sv: string
+}
 
 export interface Profile {
   id: string
@@ -31,6 +41,8 @@ export interface Profile {
   soundOn: boolean
   /** Bästa antal stjärnor per kombination av val. Nyckeln kommer från resultKey(). */
   best: Record<string, Stars>
+  /** Veckans läxglosor (Engelska → Mina läxglosor). */
+  homework: HomeworkGloss[]
 }
 
 export interface SavedData {
@@ -87,7 +99,22 @@ function parseProfile(p: unknown): Profile | null {
       typeof p.roundLength === 'number' && ROUND_LENGTH_OPTIONS.includes(p.roundLength) ? p.roundLength : DEFAULT_ROUND_LENGTH,
     soundOn: typeof p.soundOn === 'boolean' ? p.soundOn : true,
     best,
+    homework: parseHomework(p.homework),
   }
+}
+
+/** Läxglosorna kom till efter version 1 – saknas de blir det en tom lista. */
+function parseHomework(list: unknown): HomeworkGloss[] {
+  if (!Array.isArray(list)) return []
+  const glosses: HomeworkGloss[] = []
+  for (const g of list) {
+    if (!isObject(g) || typeof g.en !== 'string' || typeof g.sv !== 'string') continue
+    const en = g.en.trim().slice(0, HOMEWORK_TEXT_MAX)
+    const sv = g.sv.trim().slice(0, HOMEWORK_TEXT_MAX)
+    const id = typeof g.id === 'string' && g.id !== '' && !glosses.some((o) => o.id === g.id) ? g.id : makeId()
+    if (en && sv && glosses.length < MAX_HOMEWORK) glosses.push({ id, en, sv })
+  }
+  return glosses
 }
 
 const isObject = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x)
@@ -139,15 +166,19 @@ export function askForPersistentStorage() {
 
 // ---------- Profiler ----------
 
+/** Ett id som är unikt nog på en och samma enhet. */
+export const makeId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+
 export function newProfile(name: string, avatar: string): Profile {
   return {
-    id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+    id: makeId(),
     name: name.trim(),
     avatar,
     album: [],
     roundLength: DEFAULT_ROUND_LENGTH,
     soundOn: true,
     best: {},
+    homework: [],
   }
 }
 
@@ -180,12 +211,16 @@ export function resultKey(categoryId: string, settings: object): string {
   return `${categoryId}:${choices.join(',')}`
 }
 
-/** En spelad runda: klistermärket hamnar i albumet och bästa resultat höjs om det blev bättre. */
-export function recordRound(profile: Profile, key: string, stars: Stars, stickerId: string): Profile {
-  const best = profile.best[key]
+/**
+ * En spelad runda: klistermärket hamnar i albumet och bästa resultat höjs om det blev bättre.
+ * `key` null = spara inget bästa resultat (t.ex. läxglosor, där listan byts varje vecka).
+ */
+export function recordRound(profile: Profile, key: string | null, stars: Stars, stickerId: string): Profile {
+  const best = key === null ? undefined : profile.best[key]
+  const keep = key === null || (best !== undefined && best >= stars)
   return {
     ...profile,
     album: [...profile.album, stickerId],
-    best: best !== undefined && best >= stars ? profile.best : { ...profile.best, [key]: stars },
+    best: keep ? profile.best : { ...profile.best, [key]: stars },
   }
 }

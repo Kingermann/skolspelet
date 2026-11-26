@@ -7,6 +7,8 @@ import { CONFUSABLES, GLOSSES, type Gloss } from './words'
 export type Direction = 'en-sv' | 'sv-en'
 export type DirectionChoice = Direction | 'mix'
 
+export const DIRECTION_ICON: Record<DirectionChoice, string> = { 'en-sv': '🇬🇧→🇸🇪', 'sv-en': '🇸🇪→🇬🇧', mix: '🔀' }
+
 export interface GlossQuestion {
   gloss: Gloss
   direction: Direction

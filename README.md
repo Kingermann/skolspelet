@@ -7,10 +7,16 @@ fotbollskort och klistermärken!
 - **📝 Svenska** – välj årskurs och nivå. "Vilket av följande ord är rättstavat?" med fyra alternativ.
   Årskursen styr orden, nivån hur luriga felstavningarna är (Lätt = tydliga fel, Medel = vanliga
   stavningsfel, Svår = svåra ord och luriga fel). Efter två fel visas ett stavningstips.
-- **🇬🇧 Engelska** – glosor. Välj årskurs, riktning (engelska→svenska, svenska→engelska eller blandat)
-  och nivå. Fyra alternativ; Lätt = alternativ från andra områden, Medel = från samma område,
-  Svår = svåra glosor och förväxlingsord (quiet/quite). 🔊 läser upp det engelska ordet
-  (brittiskt uttal, webbläsarens inbyggda talsyntes).
+- **🇬🇧 Engelska** – glosor, på två sätt:
+  - **📚 Spelets glosor** – välj årskurs, riktning (engelska→svenska, svenska→engelska eller blandat)
+    och nivå. Fyra alternativ; Lätt = alternativ från andra områden, Medel = från samma område,
+    Svår = svåra glosor och förväxlingsord (quiet/quite).
+  - **📝 Mina läxglosor** – skriv in veckans glosor (engelska + svenska) och bli förhörd åt valfritt
+    håll. Man **skriver** svaret, som på ett riktigt förhör. Varje glosa kommer en gång per runda, och
+    efteråt visas de man missade under "Öva mer på". Glosorna sparas i profilen; "Töm listan" när
+    nya glosor kommer. Se [Läxglosor](#läxglosor) för hur svaren rättas.
+
+  🔊 läser upp det engelska ordet (brittiskt uttal, webbläsarens inbyggda talsyntes).
 - **🌍 Geografi** – välj spelläge, världsdel och nivå:
   - **🗺️ Var ligger landet?** – du får ett land och ska trycka där det ligger på kartan.
   - **🚩 Flaggor** – du ser en flagga och väljer rätt land bland fyra.
@@ -58,6 +64,18 @@ Varje profil sparar sitt **album**, sina **inställningar** (antal frågor, ljud
 
 Allt sparas bara på enheten, i webbläsaren. Det synkas inte mellan enheter och försvinner om man
 rensar webbplatsdata i Safari eller tar bort genvägen på hemskärmen.
+
+## Läxglosor
+
+Så rättas svaren:
+
+- Stora/små bokstäver, extra mellanslag och skiljetecken spelar ingen roll – "Dog." är rätt för "dog".
+- Å, ä och ö måste vara rätt, och småord som "a", "to" och "en" måste vara med om de står i listan.
+- Flera rätta svar: skriv `/` emellan när glosan läggs in, t.ex. `you are / you're` eller `a dog / dog`.
+- En bokstav fel ger "Nästan! Kolla stavningen" – det räknas som fel men man får försöka igen.
+
+Högst 50 glosor och 40 tecken per ord. Regler och gränser finns i
+`src/categories/engelska/homework.ts` och `src/game/profiles.ts`.
 
 ## Var ändrar man saker?
 
@@ -145,6 +163,8 @@ npm test
 - **Engelska:** alla engelska ord är rättstavade med brittisk stavning (dictionary-en-gb) och alla svenska
   ord finns i den svenska ordlistan. Varje engelskt och svenskt ord finns bara en gång i hela listan,
   så att en fråga aldrig kan få två rätta svar.
+- **Läxglosor:** reglerna för rättning ovan (stora bokstäver, skiljetecken, ’, `/`, "nästan"), att
+  varje glosa förhörs exakt en gång och att samma engelska ord inte kan läggas in två gånger.
 - **Profiler:** det sparade går att läsa tillbaka likadant, trasig eller okänd data kraschar inte spelet
   (och sparas undan i stället för att skrivas över), bästa resultat höjs bara när man blivit bättre och
   spelet fungerar även när webbläsaren inte låter det spara.

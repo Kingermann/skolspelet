@@ -1,6 +1,6 @@
 import { defineCategory } from '../types'
+import { EngelskaPlay, type EngelskaSettings } from './EngelskaPlay'
 import { EngelskaSetup } from './EngelskaSetup'
-import { GlossRound, type EngelskaSettings } from './GlossRound'
 
 export const engelska = defineCategory<EngelskaSettings>({
   id: 'engelska',
@@ -8,5 +8,5 @@ export const engelska = defineCategory<EngelskaSettings>({
   icon: '🇬🇧',
   color: '#3da5ff',
   Setup: EngelskaSetup,
-  Play: GlossRound,
+  Play: EngelskaPlay,
 })
