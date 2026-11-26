@@ -41,6 +41,11 @@ håller allt state i `useState` och väljer skärm med en `Screen`-union
 - `src/components/` – gemensamma skärmar: `Menus.tsx` (start + album), `GradeScreen`, `LevelScreen`,
   `Result`, `SettingsScreen`, `Progress`, `Header`, `StickerView`.
 - `src/index.css` – all styling, färgvariabler överst.
+- `public/` – ikon (`icon.svg` = källan: Noto Emojis 🎒, Apache 2.0, på `#c9b8ff`; PNG 180/192/512
+  renderade från den, t.ex. med `@resvg/resvg-js` – inget beroende i projektet) och
+  `manifest.webmanifest` (relativa sökvägar, eftersom sidan ligger under `/skolspelet/`).
+  Familjen spelar som hemskärmsapp på iPhone/iPad – där har appen egen lagring, skild från Safari,
+  och en ny ikon syns först när genvägen läggs till igen.
 
 ## Kategorier
 

@@ -36,6 +36,15 @@ Stäng av med `Ctrl + C` i terminalen.
 
 > Inget sparas – laddar man om sidan börjar allt om (även inställningen för antal frågor). Ljudet hörs inte om iPhonen står på ljudlöst.
 
+## Spela på iPhone och iPad
+
+Öppna spelets adress på GitHub Pages i Safari, tryck på Dela → **Lägg till på hemskärmen**.
+Då får spelet en egen ikon (🎒) och öppnas i helskärm som en app.
+
+- **Öppna alltid spelet från ikonen.** På iPhone och iPad har appen på hemskärmen sin egen
+  lagring, skild från Safari – spelar man ibland i Safari syns inte det i appen och tvärtom.
+- Byts ikonen ut måste man ta bort genvägen och lägga till den igen för att se den nya.
+
 ## Var ändrar man saker?
 
 | Vill ni ändra… | Fil |
@@ -68,6 +77,12 @@ Flaggorna kommer från paketet [flag-icons](https://flagicons.lipis.dev) (MIT-li
 officiella, aktuella designen (t.ex. Syriens nya flagga). Alla visas i formatet 4:3, så proportionerna
 kan skilja lite från verkligheten (Schweiz blir t.ex. rektangulär). Afghanistan visas med den flagga
 som FN och Sverige använder.
+
+## Ikonen
+
+Ryggsäcken 🎒 kommer från [Noto Emoji](https://github.com/googlefonts/noto-emoji) (Apache License 2.0)
+och ligger på lila bakgrund i `public/icon.svg`. PNG-filerna bredvid (`icon-180.png` för iPhone/iPad,
+`icon-192.png` och `icon-512.png` för manifestet) är samma bild i olika storlekar.
 
 ## Ordlistor i testerna
 
