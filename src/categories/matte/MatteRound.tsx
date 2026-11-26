@@ -8,11 +8,14 @@ import { fmt, makeChoices, shuffle } from './generator'
 import { LEVEL_STYLE } from '../../game/levels'
 import { OP_INFO } from './labels'
 import { generateRound } from './round'
+import { isTopic, type Topic } from './topics'
+import { TopicRound } from './topics/TopicRound'
 import type { Grade, Level, OpChoice, Problem } from './types'
 
 export interface MatteSettings {
   grade: Grade
-  op: OpChoice
+  /** Ett räknesätt (+ − × ÷ eller blandat) eller ett av de nya momenten (bråk, klockan …). */
+  op: OpChoice | Topic
   level: Level
 }
 
@@ -25,13 +28,21 @@ interface Item {
 const RETRY = ['Nästan! Försök igen 💪', 'Inte riktigt – en gång till! 🤔', 'Ett försök till! 🍀']
 const MAX_DIGITS = 7
 
-interface Props {
-  settings: MatteSettings
+interface Props<S = MatteSettings> {
+  settings: S
   onFinish: (firstTryCorrect: number, total: number) => void
   onQuit: () => void
 }
 
+/** Matte: räknesätten har sin runda, de nya momenten sin. */
 export function MatteRound({ settings, onFinish, onQuit }: Props) {
+  const { grade, level, op } = settings
+  if (isTopic(op)) return <TopicRound grade={grade} level={level} topic={op} onFinish={onFinish} onQuit={onQuit} />
+  return <ArithmeticRound settings={{ grade, level, op }} onFinish={onFinish} onQuit={onQuit} />
+}
+
+/** + − × ÷ och blandat. */
+function ArithmeticRound({ settings, onFinish, onQuit }: Props<{ grade: Grade; level: Level; op: OpChoice }>) {
   const { grade, level, op } = settings
   const isEasy = level === 'latt'
   const toItem = (problem: Problem): Item => ({ problem, choices: isEasy ? makeChoices(problem) : [] })

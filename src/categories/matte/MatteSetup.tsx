@@ -6,7 +6,11 @@ import { opsForGrade } from './config'
 import { LevelScreen } from '../../components/LevelScreen'
 import { LEVEL_TEXTS, OP_INFO } from './labels'
 import type { MatteSettings } from './MatteRound'
+import { TOPIC_INFO, TOPICS_FOR_GRADE, isTopic, type Topic } from './topics'
 import type { Grade, OpChoice } from './types'
+
+type Choice = OpChoice | Topic
+const infoFor = (c: Choice) => (isTopic(c) ? TOPIC_INFO[c] : OP_INFO[c])
 
 interface Props {
   onStart: (settings: MatteSettings) => void
@@ -16,7 +20,7 @@ interface Props {
 /** Matte: välj årskurs → räknesätt → nivå. */
 export function MatteSetup({ onStart, onBack }: Props) {
   const [grade, setGrade] = useState<Grade | null>(null)
-  const [op, setOp] = useState<OpChoice | null>(null)
+  const [op, setOp] = useState<Choice | null>(null)
 
   if (grade === null) return <GradeScreen chips={<span className="chip">🧮 Matte</span>} onBack={onBack} onPick={setGrade} />
   if (op === null) return <OpScreen grade={grade} onBack={() => setGrade(null)} onPick={setOp} />
@@ -26,7 +30,7 @@ export function MatteSetup({ onStart, onBack }: Props) {
       chips={
         <>
           <span className="chip">🧮 Åk {grade}</span>
-          <span className="chip">{OP_INFO[op].icon}</span>
+          <span className="chip">{infoFor(op).icon}</span>
         </>
       }
       onBack={() => setOp(null)}
@@ -37,8 +41,9 @@ export function MatteSetup({ onStart, onBack }: Props) {
 }
 
 
-function OpScreen({ grade, onPick, onBack }: { grade: Grade; onPick: (op: OpChoice) => void; onBack: () => void }) {
+function OpScreen({ grade, onPick, onBack }: { grade: Grade; onPick: (op: Choice) => void; onBack: () => void }) {
   const ops: OpChoice[] = [...opsForGrade(grade), 'mix']
+  const topics = TOPICS_FOR_GRADE[grade]
   return (
     <div className="screen">
       <Header onBack={onBack}>
@@ -59,6 +64,15 @@ function OpScreen({ grade, onPick, onBack }: { grade: Grade; onPick: (op: OpChoi
         ))}
       </div>
       {grade === 6 && <p className="hint-text">Tips: på Medel och Svår i åk 6 tränar du prioriteringsregler!</p>}
+      <h3 className="album-section">Mer att öva på</h3>
+      <div className="grid grid-2">
+        {topics.map((t) => (
+          <button key={t} className="tile" style={{ background: TOPIC_INFO[t].color }} onClick={tap(() => onPick(t))}>
+            <span className="tile-big">{TOPIC_INFO[t].icon}</span>
+            <span className="tile-small">{TOPIC_INFO[t].label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

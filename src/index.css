@@ -1371,3 +1371,196 @@ button:disabled {
   font-size: 18px;
   font-weight: 600;
 }
+
+/* ---------- Matte: nya moment (bråk, klockan, mönster, ekvationer) ---------- */
+.topic-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.topic-prompt {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.topic-text,
+.topic-answer-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.15em;
+}
+
+.picture {
+  width: min(52vw, 200px);
+  height: auto;
+}
+
+.picture-wide {
+  width: min(70vw, 280px);
+}
+
+.picture-set {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+.set-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+}
+
+.set-boxed {
+  padding: 4px 6px;
+  border: 3px dashed #c9b8ff;
+  border-radius: 14px;
+}
+
+.set-marked {
+  border-radius: 50%;
+  background: #ffe08a;
+  box-shadow: 0 0 0 3px #ffb703;
+}
+
+/* Bråk: täljare över nämnare. */
+.frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1.05;
+  font-size: 0.72em;
+  margin: 0 0.12em;
+}
+
+.frac-num {
+  padding: 0 0.15em 0.04em;
+  border-bottom: 0.08em solid currentColor;
+}
+
+.frac-den {
+  padding: 0.04em 0.15em 0;
+}
+
+.slot-frac .frac {
+  font-size: 0.8em;
+  gap: 4px;
+}
+
+.slot-frac .frac-num {
+  padding-bottom: 6px;
+}
+
+.slot-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.slot-part {
+  cursor: pointer;
+  min-width: 1.3em;
+}
+
+.slot-active {
+  outline: 4px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.choices-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.choice-words {
+  font-size: 22px;
+  padding: 18px 6px;
+}
+
+.numpad .numpad-extra {
+  background: #f1ecff;
+  color: var(--primary-dark);
+}
+
+.numpad .numpad-wide {
+  grid-column: 1 / -1;
+}
+
+/* Bild + två svarsrutor + knappsats med fem rader ska få plats på en iPhone. */
+.topic-card {
+  padding-top: 16px;
+}
+
+.topic-card .picture {
+  width: min(42vw, 160px);
+}
+
+.topic-card .picture-wide {
+  width: min(62vw, 240px);
+}
+
+.topic-card .message {
+  min-height: 28px;
+  margin-top: 4px;
+}
+
+.topic-answer-line .slot-frac .frac,
+.topic-answer-line .slot-time {
+  font-size: 0.8em;
+}
+
+.numpad.numpad-compact {
+  gap: 8px;
+}
+
+.numpad.numpad-compact button {
+  padding: 10px 0;
+  font-size: 28px;
+}
+
+/* Låga skärmar (t.ex. iPhone SE): mindre bild, text och knappar så att ✓ syns utan att scrolla. */
+@media (max-height: 720px) {
+  .screen {
+    gap: 10px;
+  }
+
+  .card {
+    padding: 14px 12px 10px;
+  }
+
+  .topic-card .picture {
+    width: min(32vw, 120px);
+  }
+
+  .topic-card .picture-wide {
+    width: min(50vw, 190px);
+  }
+
+  .topic-prompt {
+    font-size: 17px;
+  }
+
+  .problem {
+    font-size: min(11vw, 44px);
+  }
+
+  .numpad {
+    gap: 7px;
+  }
+
+  .numpad button,
+  .numpad.numpad-compact button {
+    padding: 8px 0;
+    font-size: 24px;
+  }
+}

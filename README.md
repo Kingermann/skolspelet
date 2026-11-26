@@ -4,6 +4,19 @@ Ett spel för att öva på skolämnen. Välj kategori, spela en runda, samla stj
 fotbollskort och klistermärken!
 
 - **🧮 Matte** – välj årskurs (1–6), räknesätt och nivå. Ungefär 30 % av uppgifterna är textuppgifter.
+  Under "Mer att öva på" finns moment ur läroplanen (Lgr22), i de årskurser där de hör hemma:
+
+  | Moment | Åk 1 | Åk 2 | Åk 3 | Åk 4 | Åk 5 | Åk 6 |
+  |---|---|---|---|---|---|---|
+  | 🧩 Mönster | +1, +2, +10 | +5, −2 | ×2, större steg | större steg, minus | växande/varannan | ×2 + 1 m.m. |
+  | 🕐 Klockan | hel, halv | kvart i/över | fem-minuter (Svår: alla) | hur lång tid? | – | – |
+  | 🍕 Bråk | – | hur stor del är färgad? | del av antal (½ av 8) | jämföra | bråk ↔ decimaltal | bråk, decimal, procent |
+  | ❓ Ekvationer | ? + 3 = 7 | ? − 4 = 6 | ? × 3 = 12 | x + 7 = 15 | 4x = 28 | 2x + 3 = 11 |
+
+  Läroplanen anger bara stadier (åk 1–3, 4–6), så fördelningen inom stadiet är ett förslag som går
+  att ändra. Nivåerna fungerar som för räknesätten: Lätt = välj bland fyra, Medel = skriv svaret,
+  Svår = skriv svaret, kluriga varianter. Bråk skrivs med täljare ↓ nämnare (2/4 godtas för 1/2),
+  klocktider som 3:45 (15:45 godtas också) och decimaltal med kommaknappen.
 - **📝 Svenska** – välj årskurs och nivå. "Vilket av följande ord är rättstavat?" med fyra alternativ.
   Årskursen styr orden, nivån hur luriga felstavningarna är (Lätt = tydliga fel, Medel = vanliga
   stavningsfel, Svår = svåra ord och luriga fel). Efter två fel visas ett stavningstips.
@@ -84,6 +97,8 @@ Högst 50 glosor och 40 tecken per ord. Regler och gränser finns i
 | **Matte:** hur svårt det är (talområden per årskurs och nivå) | `src/categories/matte/config.ts` |
 | **Matte:** största tal (nu 1000) och andel textuppgifter | `MAX_NUMBER` / `STORY_SHARE` i samma fil |
 | **Matte:** textuppgifterna (berättelser, namn) | `src/categories/matte/stories.ts` |
+| **Matte:** vilka moment som finns i vilken årskurs | `TOPICS_FOR_GRADE` i `src/categories/matte/topics/index.ts` |
+| **Matte:** talföljder, klockslag, bråk och ekvationer per årskurs och nivå | `PATTERNS`, `CLOCK_MINUTES`, `PARTS`/`DECIMAL_DENS`…, `EQUATIONS` i `src/categories/matte/topics/` |
 | **Svenska:** stavningsord per årskurs (lägg gärna till veckoord!) | `src/categories/svenska/words.ts` |
 | **Svenska:** regler för felstavningar och stavningstipsen | `src/categories/svenska/misspell.ts` |
 | **Engelska:** glosor per årskurs och område, och förväxlingsord | `src/categories/engelska/words.ts` |
@@ -165,6 +180,10 @@ npm test
 
 - **Matte:** tusentals genererade uppgifter kontrolleras – facit stämmer, svaren är heltal ≥ 0,
   inget tal är större än 1000 och alla tal i uträkningen står i textuppgiften.
+- **Matte, nya moment:** hundratals uppgifter per årskurs, moment och nivå – rätt svar godtas, exakt
+  ett alternativ är rätt och inget fel alternativ råkar vara rätt (2/4 när svaret är 1/2), alla tal
+  mellan 0 och 1000, ekvationerna går ihop med svaret, talföljderna följer en regel, klockan visar
+  svaret, bråkbilderna stämmer och en runda har olika uppgifter.
 - **Svenska:** varje stavningsord finns i den svenska ordlistan (dictionary-sv), och inget felstavat
   alternativ är ett riktigt ord (t.ex. "koma" eller "hopa"). Skapar reglerna ett riktigt ord säger
   testet exakt vilket som ska läggas till i `realWords.ts`, där sådana ord spärras.
@@ -186,5 +205,6 @@ npm test
 
 - Geografi: huvudstäder i Europa, Sveriges landskap, "välj rätt flagga" (omvänt flaggquiz)
 - Geografi: "Fyll hela kartan" som utmaning
-- Matte: klockan, former, bråk, negativa tal och decimaltal
+- Matte: decimaltal, procent och negativa tal som egna moment, former, omkrets och area, enheter,
+  medelvärde – och textuppgifter för bråk och ekvationer
 - Uppläsning av frågor
