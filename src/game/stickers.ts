@@ -45,6 +45,8 @@ export const PLAYERS: PlayerSticker[] = (
     { id: 'isak', name: 'Alexander Isak', number: 9, ...SWEDEN },
     { id: 'asllani', name: 'Kosovare Asllani', number: 9, ...SWEDEN },
     { id: 'gyokeres', name: 'Viktor Gyökeres', number: 17, ...SWEDEN },
+    { id: 'lindelof', name: 'Victor Nilsson Lindelöf', number: 3, ...SWEDEN },
+    { id: 'elanga', name: 'Anthony Elanga', number: 11, ...SWEDEN },
     { id: 'carlsbogard', name: 'Mimmi Carlsbogård', number: 1, ...SWEDEN },
     { id: 'neymar', name: 'Neymar Jr', number: 10, ...BRAZIL },
     { id: 'vinicius', name: 'Vinícius Júnior', number: 7, ...BRAZIL },
