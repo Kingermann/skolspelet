@@ -1,0 +1,86 @@
+# Skolspelet – anteckningar för Claude
+
+Ett webbspel för barn (åk 1–6) där man övar skolämnen: välj kategori → gör val (årskurs, nivå …) →
+spela en runda → stjärnor, konfetti, applåder och ett fotbollskort/klistermärke till albumet.
+README.md är skriven för familjen som använder spelet (hur man startar, var man ändrar saker).
+Den här filen är för den som utvecklar vidare.
+
+## Kommandon
+
+```bash
+npm run dev       # dev-server, bara localhost:5173
+npm run dev:lan   # dev-server på hemnätverket (för att testa på telefon)
+npm test          # Vitest – måste gå igenom, annars publiceras inget
+npm run lint      # oxlint
+npm run build     # tsc -b + vite build → dist/ (base /skolspelet/, med CSP)
+```
+
+Publicering: varje push till `main` kör `.github/workflows/deploy.yml` (test → build → GitHub Pages).
+Repo: github.com/Kingermann/skolspelet.
+
+## Teknik
+
+React 19, TypeScript 7, Vite 8, Vitest 5, oxlint. Inga routrar eller state-bibliotek – `App.tsx`
+håller allt state i `useState` och väljer skärm med en `Screen`-union
+(`start | setup | play | result | album | settings`). **Ingenting sparas** – omladdning börjar om.
+
+## Arkitektur
+
+- `src/categories/<id>/` – en mapp per kategori. `index.ts` exporterar
+  `defineCategory<Settings>({ id, name, icon, color, Setup, Play })` (typen i `categories/types.ts`).
+  - `Setup` anropar `onStart(settings)` när alla val är gjorda.
+  - `Play` anropar `onFinish(firstTryCorrect, total)` när rundan är slut.
+  - Registreras i `src/categories/index.ts` (ordningen där = ordningen på startskärmen).
+- `src/game/useRoundFlow.ts` – gemensam rundlogik som alla `Play` använder: två försök per fråga,
+  svaret visas efter två fel, stjärnmarkering, "rätt i rad" (stort firande var tredje), automatiskt
+  vidare efter rätt svar. Kategorin anropar `correct()` / `wrong(retryMsg, revealMsg)` / `advance()`.
+- `src/game/` – övrigt gemensamt: `constants.ts` (rundlängd, stjärngränser), `gameSettings.ts`
+  (context för antal frågor), `grades.ts` / `levels.ts` (årskurs- och nivåval), `sound.ts`
+  (Web Audio), `speech.ts` (talsyntes, används av Engelska), `celebrate.ts` (konfetti),
+  `stickers.ts` (klistermärken + fotbollsspelare), `random.ts`.
+- `src/components/` – gemensamma skärmar: `Menus.tsx` (start + album), `GradeScreen`, `LevelScreen`,
+  `Result`, `SettingsScreen`, `Progress`, `Header`, `StickerView`.
+- `src/index.css` – all styling, färgvariabler överst.
+
+## Kategorier
+
+| Kategori | Kärnfiler | Notering |
+|---|---|---|
+| Matte | `generator.ts`, `config.ts`, `stories.ts` | Talområden per årskurs × nivå. ~30 % textuppgifter. Max 1000, bara heltal ≥ 0. |
+| Svenska | `words.ts`, `misspell.ts`, `realWords.ts` | Felstavningar skapas med regler. Felstavningar som råkar bli riktiga ord spärras i `realWords.ts`. |
+| Engelska | `words.ts`, `quiz.ts` | Glosor per årskurs och område, brittisk stavning. Riktning en→sv, sv→en eller blandat. Förväxlingsord på Svår. |
+| Geografi | `countries.ts`, `map.ts`, `WorldMap.tsx`, `flags.ts` | Kartspel (d3-geo/zoom + world-atlas) och flaggquiz (flag-icons). Nivå 1–3 per land. |
+
+## Konventioner
+
+- **Allt på svenska**: UI-texter, kommentarer, testnamn och commit-meddelanden. Kod-identifierare på engelska.
+- Commit-meddelanden: kort rubrik på svenska ("Ny kategori Svenska: rättstavning"), sedan en brödtext
+  som förklarar vad och varför. Ett commit per funktion.
+- Nämn aldrig "Claude" i commit- eller PR-meddelanden (organisationsregel), inte heller co-author-rader.
+- Kommentera med JSDoc på svenska som förklarar *varför* och vad som går att ändra.
+- När något ändras som familjen kan vilja justera: uppdatera tabellen "Var ändrar man saker?" i README.
+- Nya kategorier ska ha tester, och testerna ska vara datadrivna och täcka hela innehållet:
+  - ord kontrolleras mot riktiga ordlistor via `nspell` (`src/testing/dictionaries.ts`,
+    dictionary-sv / dictionary-en-gb – bara devDependencies, följer inte med i appen)
+  - ingen fråga får kunna ha två rätta svar (t.ex. varje glosa bara en gång)
+  - genererade uppgifter testas i tusental (facit, talgränser)
+
+## Säkerhet och integritet (medvetna val – behåll dem)
+
+- Inga externa anrop: inga konton, ingen analys, typsnittet (Fredoka) ligger lokalt via `@fontsource`.
+- CSP läggs in i byggd version av ett plugin i `vite.config.ts` – allt från `'self'`. Nya beroenden
+  får inte kräva externa domäner, inline-skript eller `eval`.
+- Dev-servern lyssnar bara på localhost; `dev:lan` är ett uttryckligt val.
+- `allowScripts` i `package.json` styr vilka paket som får köra installationsskript.
+
+## Status (senast uppdaterad 2026-11-26)
+
+Byggt 24–25 nov 2026: Matte → MVP med album → fotbollskort/konfetti → textuppgifter → kategorisystem
++ Geografi (karta) → nivåer → flaggquiz → inställning för antal frågor → säkerhet/CSP → GitHub Pages
+→ Svenska (rättstavning) → Engelska (glosor).
+
+Idéer för nästa steg (se även README):
+- Geografi: huvudstäder i Europa, Sveriges landskap, omvänt flaggquiz, "fyll hela kartan"
+- Matte: klockan, former, bråk, negativa tal, decimaltal
+- Uppläsning av frågor (talsyntesen finns redan i `src/game/speech.ts`)
+- Spara framsteg i localStorage (just nu sparas inget – README säger det uttryckligen)

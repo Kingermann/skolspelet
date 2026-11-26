@@ -127,4 +127,3 @@ npm test
 - Matte: klockan, former, bråk, negativa tal och decimaltal
 - Uppläsning av frågor
 - Spara framsteg (localStorage)
-- Publicera på GitHub Pages så att spelet fungerar utan datorn
