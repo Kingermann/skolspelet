@@ -6,6 +6,7 @@ import { HOMEWORK_TEXT_MAX, makeId, type HomeworkGloss } from '../../game/profil
 import { alternatives, display, glossProblem } from './homework'
 import type { HomeworkSettings } from './HomeworkRound'
 import type { DirectionChoice } from './quiz'
+import { SwedishLetters } from './SwedishLetters'
 
 const DIRECTIONS: { choice: DirectionChoice; label: string }[] = [
   { choice: 'en-sv', label: '🇬🇧 → 🇸🇪' },
@@ -158,6 +159,7 @@ function HomeworkEditor({ onDone }: { onDone: () => void }) {
           enterKeyHint="done"
           onChange={(e) => setSv(e.target.value)}
         />
+        <SwedishLetters input={svInput} value={sv} onChange={setSv} />
         {showProblem && <p className="form-problem">{problem}</p>}
         <p className="hint-text">Flera rätta svar? Skriv / emellan, t.ex. "you are / you're".</p>
         <button type="submit" className="big-btn primary" disabled={problem !== null}>

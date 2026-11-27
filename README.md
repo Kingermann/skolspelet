@@ -87,6 +87,8 @@ Så rättas svaren:
 
 - Stora/små bokstäver, extra mellanslag och skiljetecken spelar ingen roll – "Dog." är rätt för "dog".
 - Å, ä och ö måste vara rätt, och småord som "a", "to" och "en" måste vara med om de står i listan.
+  Under svenska skrivrutor finns knappar för **å ä ö**, så att det går att skriva dem även med
+  engelskt tangentbord på iPhone/iPad (där finns de annars bara om man håller nere a eller o).
 - Flera rätta svar: skriv `/` emellan när glosan läggs in, t.ex. `you are / you're` eller `a dog / dog`.
 - En bokstav fel ger "Nästan! Kolla stavningen" – det räknas som fel men man får försöka igen.
 

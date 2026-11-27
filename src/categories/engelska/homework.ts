@@ -81,3 +81,22 @@ export function glossProblem(en: string, sv: string, list: HomeworkGloss[]): str
   if (list.some((g) => alternatives(g.en).map(normalize).some((w) => words.includes(w)))) return 'Den glosan finns redan'
   return null
 }
+
+/** Bokstäverna som får egna knappar – de saknas på engelskt tangentbord. */
+export const SWEDISH_LETTERS = ['å', 'ä', 'ö'] as const
+
+/**
+ * Sätter in en bokstav där markören står (ersätter det som är markerat).
+ * Ger null om rutan redan är full, så att knappen inte gör något.
+ */
+export function insertLetter(
+  value: string,
+  start: number,
+  end: number,
+  letter: string,
+  maxLength?: number,
+): { value: string; caret: number } | null {
+  const next = value.slice(0, start) + letter + value.slice(end)
+  if (maxLength !== undefined && maxLength > 0 && next.length > maxLength) return null
+  return { value: next, caret: start + letter.length }
+}

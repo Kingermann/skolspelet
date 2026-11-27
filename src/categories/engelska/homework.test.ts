@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { MAX_HOMEWORK, type HomeworkGloss } from '../../game/profiles'
-import { alternatives, checkAnswer, display, distance, glossProblem, makeHomeworkRound } from './homework'
+import { alternatives, checkAnswer, display, distance, glossProblem, insertLetter, makeHomeworkRound } from './homework'
 
 const gloss = (en: string, sv: string, id = en): HomeworkGloss => ({ id, en, sv })
 
@@ -102,5 +102,24 @@ describe('läxglosor: lägga till', () => {
   it('listan har ett tak', () => {
     const full = Array.from({ length: MAX_HOMEWORK }, (_, i) => gloss(`w${i}`, `o${i}`))
     expect(glossProblem('dog', 'hund', full)).not.toBeNull()
+  })
+})
+
+describe('läxglosor: å ä ö-knapparna', () => {
+  it('sätter in bokstaven där markören står', () => {
+    expect(insertLetter('hst', 1, 1, 'ä')).toEqual({ value: 'häst', caret: 2 })
+    expect(insertLetter('', 0, 0, 'ö')).toEqual({ value: 'ö', caret: 1 })
+    expect(insertLetter('bl', 2, 2, 'å')).toEqual({ value: 'blå', caret: 3 })
+  })
+
+  it('ersätter markerad text', () => {
+    expect(insertLetter('hast', 1, 2, 'ä')).toEqual({ value: 'häst', caret: 2 })
+  })
+
+  it('gör ingenting när rutan är full', () => {
+    expect(insertLetter('abc', 3, 3, 'ö', 3)).toBeNull()
+    expect(insertLetter('abc', 0, 1, 'ö', 3)).toEqual({ value: 'öbc', caret: 1 })
+    // -1 = ingen gräns (det input.maxLength ger när attributet saknas)
+    expect(insertLetter('abc', 3, 3, 'ö', -1)).toEqual({ value: 'abcö', caret: 4 })
   })
 })

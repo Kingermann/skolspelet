@@ -1564,3 +1564,32 @@ button:disabled {
     font-size: 24px;
   }
 }
+
+/* å ä ö-knapparna under svenska skrivrutor (läxglosor). */
+.letter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.letter-btn {
+  flex: 0 1 76px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--secondary);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 28px;
+  font-weight: 700;
+  box-shadow: 0 4px 0 rgba(43, 34, 80, 0.18);
+  transition: transform 0.08s;
+}
+
+.letter-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(43, 34, 80, 0.18);
+}
+
+.letter-btn:disabled {
+  opacity: 0.4;
+}

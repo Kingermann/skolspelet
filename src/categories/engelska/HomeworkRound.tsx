@@ -8,6 +8,7 @@ import type { RoundSummary } from '../types'
 import { SpeakButton } from './GlossRound'
 import { alternatives, checkAnswer, display, makeHomeworkRound, type HomeworkQuestion } from './homework'
 import { DIRECTION_ICON, type DirectionChoice } from './quiz'
+import { SwedishLetters } from './SwedishLetters'
 
 /** Läxglosor: man skriver in egna glosor och blir förhörd genom att skriva svaret. */
 export interface HomeworkSettings {
@@ -115,6 +116,7 @@ export function HomeworkRound({ settings, onFinish, onQuit }: Props) {
           enterKeyHint={phase === 'reveal' ? 'next' : 'done'}
           onChange={(e) => setAnswer(e.target.value)}
         />
+        {toSwedish && <SwedishLetters input={input} value={answer} onChange={setAnswer} disabled={done} />}
         {phase === 'reveal' ? (
           <button type="submit" className="big-btn primary">
             Nästa ➜
