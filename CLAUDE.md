@@ -60,7 +60,7 @@ håller allt state i `useState` och väljer skärm med en `Screen`-union
 - `src/game/` – övrigt gemensamt: `constants.ts` (rundlängd, stjärngränser), `gameSettings.ts`
   (context för antal frågor), `grades.ts` / `levels.ts` (årskurs- och nivåval), `sound.ts`
   (Web Audio), `speech.ts` (talsyntes, används av Engelska), `celebrate.ts` (konfetti),
-  `stickers.ts` (klistermärken + fotbollsspelare), `random.ts`.
+  `stickers.ts` (klistermärken + fotbollsspelare: land på tröjan, `facts` för baksidan som visas när man trycker på kortet i albumet – `CardViewer` i `StickerView.tsx`; siffrorna är kollade nov 2026 och blir gamla), `random.ts`.
 - `src/components/` – gemensamma skärmar: `Menus.tsx` (start + album), `GradeScreen`, `LevelScreen`,
   `Result`, `SettingsScreen`, `Progress`, `Header`, `StickerView`.
 - `src/index.css` – all styling, färgvariabler överst.

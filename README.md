@@ -112,6 +112,7 @@ Högst 50 glosor och 40 tecken per ord. Regler och gränser finns i
 | Antal frågor per runda | ⚙️ på startskärmen (3, 5, 10, 15 eller 20, sparas per profil). Valen och standardvärdet finns i `src/game/constants.ts` |
 | Bilderna man kan välja till sin profil | `src/game/avatars.ts` |
 | Klistermärken och fotbollsspelare | `src/game/stickers.ts` |
+| Fakta på fotbollskortens baksida (klubb, landskamper, mål, "Kul att veta") och datumet på stämpeln (`STATS_DATE`) | `src/game/stickers.ts` |
 | Hur mycket konfetti det blir | `src/game/celebrate.ts` |
 | Ljuden (pling, applåder, fanfar) | `src/game/sound.ts` |
 | Färger och utseende | `src/index.css` (överst finns alla färger) |

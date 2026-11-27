@@ -1593,3 +1593,228 @@ button:disabled {
 .letter-btn:disabled {
   opacity: 0.4;
 }
+
+/* ---------- Fotbollskort som vänds (albumet) ---------- */
+.album-card-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border-radius: 16px;
+}
+
+.card-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  background: rgba(43, 34, 80, 0.72);
+  animation: fade-in 0.2s ease-out both;
+}
+
+.card-viewer-close {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: 16px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: white;
+  color: var(--ink);
+  font-size: 24px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+.card-viewer-hint {
+  margin: 0;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Kortets storlek: så stort som möjligt, men både bredd och höjd ska få plats (iPhone SE). */
+.flip-card {
+  --card-w: min(80vw, 320px, calc((100dvh - 170px) * 3 / 4));
+  width: var(--card-w);
+  aspect-ratio: 3 / 4;
+  perspective: 1200px;
+  cursor: pointer;
+  animation: pop-in 0.3s ease-out both;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.flip-card:focus-visible {
+  outline: 4px solid var(--yellow);
+  outline-offset: 6px;
+  border-radius: 20px;
+}
+
+.flip-inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+
+.flip-card.flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+.flip-front .player-card {
+  height: 100%;
+  padding: 14px 12px 12px;
+  border-width: 6px;
+  border-radius: 22px;
+}
+
+.flip-front .player-flag {
+  top: 10px;
+  left: 12px;
+  font-size: 34px;
+}
+
+.flip-front .player-name {
+  font-size: 22px;
+  padding: 6px;
+  border-radius: 12px;
+}
+
+/* Baksidan: vit "tryckt" yta med tröjfärgen som ram och rubrikfält. */
+.player-back {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 6px solid var(--shirt);
+  border-radius: 22px;
+  background: var(--shirt);
+  color: var(--ink);
+  text-align: left;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 3px #ffd23f,
+    0 6px 0 rgba(0, 0, 0, 0.25);
+  font-size: clamp(13px, calc(var(--card-w) * 0.052), 16px);
+}
+
+.player-back-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--shirt);
+  color: var(--shirt-ink);
+}
+
+.player-back-number {
+  grid-row: span 2;
+  font-size: 2.6em;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.player-back-name {
+  font-size: 1.2em;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.player-back-country {
+  font-weight: 600;
+}
+
+.player-back-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  border-radius: 0 0 16px 16px;
+  background: #fffdf5;
+}
+
+.player-back-facts {
+  margin: 0;
+  padding: 8px 12px 4px;
+}
+
+.player-back-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px dashed rgba(43, 34, 80, 0.18);
+}
+
+.player-back-facts dt {
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.player-back-facts dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+}
+
+.player-back-empty {
+  margin: 16px 12px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.player-back-fun {
+  margin: 6px 10px 0;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: #fff3c4;
+  font-size: 0.92em;
+  line-height: 1.25;
+}
+
+.player-back-fun strong {
+  display: block;
+  font-size: 0.95em;
+}
+
+.player-back-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding: 6px 12px 8px;
+  color: var(--ink-soft);
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-inner {
+    transition-duration: 0.01ms;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}

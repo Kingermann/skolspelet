@@ -1,8 +1,9 @@
+import { useState } from 'react'
 import type { Category } from '../categories/types'
 import type { Profile } from '../game/profiles'
-import { ALL_STICKERS, EMOJI_STICKERS, PLAYERS, stickerById } from '../game/stickers'
+import { ALL_STICKERS, EMOJI_STICKERS, PLAYERS, stickerById, type PlayerSticker } from '../game/stickers'
 import { Header } from './Header'
-import { MissingPlayerCard, StickerView } from './StickerView'
+import { CardViewer, MissingPlayerCard, StickerView } from './StickerView'
 import { tap } from './tap'
 
 // ---------- Start ----------
@@ -54,6 +55,8 @@ export function AlbumScreen({ album, onBack }: { album: string[]; onBack: () => 
   const owned = new Set(album.filter((id) => stickerById(id)))
   const count = (id: string) => album.filter((a) => a === id).length
   const badge = (id: string) => count(id) > 1 && <span className="sticker-count">×{count(id)}</span>
+  // Kortet som visas förstorat och vänt, om man har tryckt på ett.
+  const [open, setOpen] = useState<PlayerSticker | null>(null)
   return (
     <div className="screen">
       <Header onBack={onBack}>
@@ -68,11 +71,19 @@ export function AlbumScreen({ album, onBack }: { album: string[]; onBack: () => 
       <div className="album album-players">
         {PLAYERS.map((p) => (
           <div key={p.id} className="album-slot">
-            {owned.has(p.id) ? <StickerView sticker={p} /> : <MissingPlayerCard />}
+            {owned.has(p.id) ? (
+              <button className="album-card-btn" aria-label={`${p.name} – vänd kortet`} onClick={tap(() => setOpen(p))}>
+                <StickerView sticker={p} />
+              </button>
+            ) : (
+              <MissingPlayerCard />
+            )}
             {badge(p.id)}
           </div>
         ))}
       </div>
+
+      {open && <CardViewer player={open} onClose={() => setOpen(null)} />}
 
       <h3 className="album-section">🐶 Djur, mat och rymden</h3>
       <div className="album">
